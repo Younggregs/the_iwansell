@@ -12,26 +12,26 @@ class AddAccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ['firstname','lastname','email','campus','password']
+        fields = ['firstname','lastname','phone','campus','password']
 
 
-class SignInSerializer(serializers.ModelSerializer):
+class SignInSerializer(serializers.Serializer):
 
-    class Meta:
-        model = Account
-        fields = ['email','password']
+        username = serializers.CharField()
+        password = serializers.IntegerField()
+
 
 class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'image', 'icon']
 
 class SubCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Category
-        fields = ['id', 'name']
+        model = SubCategory
+        fields = ['id', 'name', 'image']
 
 
 class CampusSerializer(serializers.ModelSerializer):
@@ -53,7 +53,7 @@ class TrendSerializer(serializers.ModelSerializer):
 
    class Meta:
         model = Trending
-        fields = ['product_image']
+        fields = ['id', 'product_image']
 
 
 
@@ -83,6 +83,14 @@ class ProductSerializer(serializers.Serializer):
     lastname = serializers.CharField()
     phone = serializers.CharField()
     display_pic = serializers.CharField()
+
+
+class ProductSnippetSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Product
+        fields = ['id', 'product_name', 'product_image', 'starting_price']
+
 
 
 

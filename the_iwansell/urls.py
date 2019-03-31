@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 from rest_framework.urlpatterns import format_suffix_patterns
 
 urlpatterns = [
-    url(r'^', include('iwansell.urls')),
+    url(r'^api/', include('iwansell.urls')),
     url(r'^admin/', admin.site.urls),
 ]
 

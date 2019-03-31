@@ -6,7 +6,7 @@ app_name = 'iwansell'
 
 urlpatterns = [
     #auth/
-    url(r'^auth$', drf_views.obtain_auth_token, name='auth'),
+    url(r'^auth/$', drf_views.obtain_auth_token, name='auth'),
 
     #iwansell/
     url(r'^$',views.index, name = 'index'),
@@ -47,11 +47,26 @@ urlpatterns = [
     #iwansell/category
     url(r'^category/$',views.CategoryView.as_view(), name = 'category'),
 
+    #iwansell/category_product
+    url(r'^category_product/(?P<campus_id>[0-9]+)/(?P<category_id>[0-9]+)/(?P<show_more>[0-9]+)/$',views.CategoryProduct.as_view(), name = 'categoryproduct'),
+
     #iwansell/subcategory
-    url(r'^subcategory/(?P<category_id>[0-9]+)/$',views.SubCategoryView.as_view(), name = 'category'),
+    url(r'^subcategory/(?P<category_id>[0-9]+)/$',views.SubCategoryView.as_view(), name = 'subcategory'),
+
+    #iwansell/subcategory_main
+    url(r'^subcategory_main/$',views.SubCategoryMain.as_view(), name = 'subcategory_main'),
+
+    #iwansell/subcategory_product
+    url(r'^subcategory_product/(?P<campus_id>[0-9]+)/(?P<subcategory_id>[0-9]+)/$',views.SubCategoryProduct.as_view(), name = 'subcategory_product'),
+
+    #iwansell/sub_category_icons
+    url(r'^sub_category_icons/$',views.SubCategoryIcon.as_view(), name = 'subcategoryicons'),
 
     #iwansell/campus
     url(r'^campus/$',views.CampusView.as_view(), name = 'campus'),
+
+    #iwansell/campus
+    url(r'^campus_search/$',views.CampusSearch.as_view(), name = 'campus_search'),
 
     #iwansell/update_dp
     url(r'^update_dp/$',views.UpdateDP.as_view(), name = 'update-dp'),
@@ -75,10 +90,10 @@ urlpatterns = [
     url(r'^product_video/(?P<product_id>[0-9]+)/$',views.ProductVideo.as_view(), name = 'product-video'),
 
     #iwansell/search/category_id/search_phrase
-    url(r'^search/(?P<campus_id>[0-9]+)/(?P<category_id>[0-9]+)/(?P<search_phrase>\w+)/$',views.Search.as_view(), name = 'search'),
+    url(r'^search/(?P<campus_id>[0-9]+)/(?P<category_id>[0-9]+)/$',views.Search.as_view(), name = 'search'),
 
     #iwansell/trending
-    url(r'^trending/(?P<campus_id>[0-9]+)/(?P<category>\w+)/$',views.TrendingView.as_view(), name = 'trending'),
+    url(r'^trending/(?P<campus_id>[0-9]+)/(?P<trending_url>\w+)/$',views.TrendingView.as_view(), name = 'trending'),
 
     #iwansell/sponsored
     url(r'^sponsored/(?P<campus_id>[0-9]+)/$',views.SponsoredView.as_view(), name = 'sponsored'),

@@ -19,29 +19,50 @@ class Account(models.Model):
     lastname = models.CharField(max_length = 30)
     phone = models.CharField(max_length=11)
     display_pic = models.FileField(default='anon.png')
-    campus = models.ForeignKey(Campus,default="1")
+    campus = models.ForeignKey(Campus, default=1, on_delete=models.CASCADE)
     date = models.DateTimeField(default = timezone.now)
 
     def __str__(self):
-        return self.email
+        return self.phone
 
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
     url_name = models.CharField(max_length=50)
+    image = models.FileField(default='anon.png')
+    icon = models.FileField(default='anon.png')
     date = models.DateTimeField(default = timezone.now)
 
     class Meta:
-        ordering = ['date']
+        ordering = ['name']
 
     def __str__(self):
          return self.name
 
 
+
+
+class SubCategory(models.Model):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    name = models.CharField(max_length = 100)
+    image = models.FileField(default='anon.png')
+    date = models.DateTimeField(default = timezone.now)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name']
+
+
+
+
+
+
 class Product(models.Model):
-    account = models.ForeignKey(Account)
-    category = models.ForeignKey(Category)
-    campus = models.ForeignKey(Campus, default=1)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    campus = models.ForeignKey(Campus, default=1, on_delete=models.CASCADE)
     description = models.TextField()
     product_name = models.CharField(max_length=100)
     product_image = models.FileField(default='product.png')
@@ -58,13 +79,13 @@ class Product(models.Model):
 
 
 class Media(models.Model):
-    product = models.ForeignKey(Product)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     image = models.FileField()
     video = models.FileField()
 
 
 class Sponsored(models.Model):
-    campus = models.ForeignKey(Campus, default=1)
+    campus = models.ForeignKey(Campus, default=1, on_delete=models.CASCADE)
     product_image = models.FileField(default='product.png')
     date = models.DateTimeField(default = timezone.now)
 
@@ -73,8 +94,8 @@ class Sponsored(models.Model):
 
 
 class Trending(models.Model):
-    campus = models.ForeignKey(Campus, default=1)
-    category = models.ForeignKey(Category)
+    campus = models.ForeignKey(Campus, default=1, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     product_image = models.FileField(default='product.png')
     date = models.DateTimeField(default = timezone.now)
 
@@ -85,7 +106,7 @@ class Trending(models.Model):
 
 
 class ProductView(models.Model):
-    product = models.ForeignKey(Product)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     views = models.IntegerField()
 
     def __str__(self):
@@ -94,8 +115,8 @@ class ProductView(models.Model):
 
 class RecentView(models.Model):
 
-    product = models.ForeignKey(Product)
-    account = models.ForeignKey(Account)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
 
     def __str__(self):
          return self.product
@@ -116,7 +137,7 @@ class ForgotPassword(models.Model):
 
 
 class EHaggler(models.Model):
-    account_1 = models.ForeignKey(Account)
+    account_1 = models.ForeignKey(Account, on_delete=models.CASCADE)
     account_2 = models.IntegerField()
     delete_for_1 = models.BooleanField(default=False)
     delete_for_2 = models.BooleanField(default=False)
@@ -124,8 +145,8 @@ class EHaggler(models.Model):
 
 
 class Messenger(models.Model):
-    ehaggler = models.ForeignKey(EHaggler)
-    messenger = models.ForeignKey(Account)
+    ehaggler = models.ForeignKey(EHaggler, on_delete=models.CASCADE)
+    messenger = models.ForeignKey(Account, on_delete=models.CASCADE)
     message = models.TextField()
     seen = models.BooleanField(default=False)
     date = models.DateTimeField(default = timezone.now)
@@ -136,32 +157,40 @@ class Messenger(models.Model):
         ordering = ['date']
 
 
-class SubCategory(models.Model):
-    category = models.ForeignKey(Category)
-    name = models.CharField(max_length = 100)
-    date = models.DateTimeField(default = timezone.now)
-
-    def __str__(self):
-        return self.name
 
     
 
 
 class EShop(models.Model):
-    account = models.ForeignKey(Account)
-    campus = models.ForeignKey(Campus, default=1)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    campus = models.ForeignKey(Campus, default=1, on_delete=models.CASCADE)
     name = models.CharField(max_length=20)
+    about = models.CharField(max_length=150, default="")
     catch_board = models.FileField()
-    date = models.DateTimeField(default = datetime.now)
+    date = models.DateTimeField(default = timezone.now)
 
     def __str__(self):
         return self.name
 
 
+
+
+
+class EShopCategory(models.Model):
+    eshop = models.ForeignKey(EShop, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return 'eShopCategory'
+
+
+
+
+
 class EShopProduct(models.Model):
-    eshop = models.ForeignKey(EShop)
-    product = models.ForeignKey(Product)
-    subcategory = models.ForeignKey(SubCategory)
+    eshop = models.ForeignKey(EShop, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    subcategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
     date = models.DateTimeField(default = timezone.now)
 
      
@@ -170,25 +199,25 @@ class EShopProduct(models.Model):
 
 
 class FavoriteProduct(models.Model):
-    account = models.ForeignKey(Account)
-    product = models.ForeignKey(Product)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     date = models.DateTimeField(default = timezone.now)
     
 
 
 class FavoriteClient(models.Model):
-    account = models.ForeignKey(Account)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
     client = models.IntegerField()
     date = models.DateTimeField(default = timezone.now)
 
 
 class FavoriteEShop(models.Model):
-    account = models.ForeignKey(Account)
-    eshop = models.ForeignKey(EShop)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    eshop = models.ForeignKey(EShop, on_delete=models.CASCADE)
     date = models.DateTimeField(default = timezone.now)
 
 class RateReview(models.Model):
-    account = models.ForeignKey(Account)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
     rating = models.IntegerField()
     review = models.CharField(max_length= 150)
     date = models.DateTimeField(default = timezone.now)
@@ -198,12 +227,12 @@ class RateReview(models.Model):
 
 
 class ClientRateReview(models.Model):
-    ratereview = models.ForeignKey(RateReview)
-    account = models.ForeignKey(Account)
+    ratereview = models.ForeignKey(RateReview, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
 
 
 class EShopRateReview(models.Model):
-    ratereview = models.ForeignKey(RateReview)
-    eshop = models.ForeignKey(EShop)
+    ratereview = models.ForeignKey(RateReview, on_delete=models.CASCADE)
+    eshop = models.ForeignKey(EShop, on_delete=models.CASCADE)
 
 

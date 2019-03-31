@@ -5,7 +5,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import check_password , make_password
 from django.views.generic.edit import FormView
-from django.core.urlresolvers import reverse_lazy , reverse
 from django.core.mail import EmailMessage
 from django.core import serializers
 from django.core.cache import cache
@@ -17,7 +16,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Account , Category, Media, Product, Campus, Sponsored, EHaggler, Messenger, EShop, SubCategory, EShopProduct, RateReview, ClientRateReview, EShopRateReview, FavoriteClient, FavoriteProduct, FavoriteEShop, Trending, ForgotPassword
-from .serializers import AccountSerializer, AddAccountSerializer,SignInSerializer, CategorySerializer, ResultListSerializer,CampusSerializer, TrendSerializer, SponsoredSerializer, ProductSerializer,MessageSerializer, HaggleClientSerializer, EShopSerializer, EShopExistSerializer, SubCategorySerializer, ClientRRSerializer, EShopRRSerializer, ProductImagesSerializer, ProductVideoSerializer, EShopStoreSerializer, ForgotPasswordSerializer, ErrorCheckSerializer, SuccessCodeSerializer, FavoriteListClient, FavoriteListEShop, FavoriteListProduct
+from .serializers import AccountSerializer, AddAccountSerializer,SignInSerializer, CategorySerializer, ResultListSerializer,CampusSerializer, TrendSerializer, SponsoredSerializer, ProductSerializer,MessageSerializer, HaggleClientSerializer, EShopSerializer, EShopExistSerializer, SubCategorySerializer, ClientRRSerializer, EShopRRSerializer, ProductImagesSerializer, ProductVideoSerializer, EShopStoreSerializer, ForgotPasswordSerializer, ErrorCheckSerializer, SuccessCodeSerializer, FavoriteListClient, FavoriteListEShop, FavoriteListProduct, ProductSnippetSerializer
 import random
 import string
 
@@ -43,6 +42,20 @@ def reset_code_generator(size=16, chars=string.ascii_uppercase + string.digits):
 
 
 
+def get_account(request):
+
+    if request.user.is_authenticated:
+        user = User.objects.get(username = request.user)
+        phone = user.username
+
+
+        account = Account.objects.get(phone=phone)
+
+        return account
+
+    else:
+        pass
+
 
 
 
@@ -66,7 +79,7 @@ class AddAccount(APIView):
 
             firstname = serializer.data['firstname']
             lastname = serializer.data['lastname']
-            email = serializer.data['email']
+            phone = serializer.data['phone']
             campus = serializer.data['campus']
             campus = Campus.objects.get(id = campus)
 
@@ -93,14 +106,13 @@ class AddAccount(APIView):
             
 
             user = User()
-            user.username = email
+            user.username = phone
             user.password = password
             user.first_name = firstname
             user.last_name = lastname
-            user.email = email
             user.save()
 
-            user = authenticate(username=email, password=raw_password)
+            user = authenticate(username=phone, password=raw_password)
 
 
             if user is not None and user.is_active:
@@ -110,14 +122,10 @@ class AddAccount(APIView):
                 account = Account()
                 account.firstname = firstname
                 account.lastname = lastname
-                account.email = email
+                account.phone = phone
                 account.campus = campus
                 account.password = password
                 account.save()
-
-
-                email = serializer.data['email']
-                request.session['email'] = email
 
                 code = 11
 
@@ -131,7 +139,7 @@ class AddAccount(APIView):
 
             else:
 
-                error_message = 'Oops login was unsuccesfull, please try again '
+                error_message = 'Yay something broke, please try again '
                 err = {
                     'error_message' : error_message
                 }
@@ -142,14 +150,14 @@ class AddAccount(APIView):
 
 
 
+        else :
+            error_message = 'oooouu something went wrong, please try again '
+            err = {
+                'error_message' : error_message
+            }
+            serializer = ErrorCheckSerializer( err, many=False)
 
-        error_message = 'hmmhm login was unsuccesfull, please try again '
-        err = {
-            'error_message' : error_message
-        }
-        serializer = ErrorCheckSerializer( err, many=False)
-
-        return Response(serializer.data)
+            return Response(serializer.data)
 
 
 
@@ -168,41 +176,38 @@ class SignIn(APIView):
         pass
 
     def post(self,request):
-        serializer = SignInSerializer(data=request.data)
-        if serializer.is_valid():
 
-            email = serializer.data['email']
-            password = serializer.data['password']
+        username = request.POST.get("username","")
+        password = request.POST.get("password","")
 
-            username = email
 
-            user = authenticate(username=username, password=password)
+        user = authenticate(username=username, password=password)
 
         
-            if user is not None and user.is_active:
-                login(request, user)
+        if user is not None and user.is_active:
+            login(request, user)
 
-                code = 11
-                success = {
-                    'code' : code
-                }
+            code = 11
+            success = {
+                'code' : code
+            }
 
-                serializer = SuccessCodeSerializer(success, many = False)
+            serializer = SuccessCodeSerializer(success, many = False)
 
-                return Response(serializer)
+            return Response(serializer.data)
 
-            else:
+        else:
 
-                error_message = 'Oww! username and password did not match '
-                err = {
-                    'error_message' : error_message
-                }
-                serializer = ErrorCheckSerializer( err, many=False)
+            error_message = 'Ye! username and password did not match '
+            err = {
+                'error_message' : error_message
+            }
+            serializer = ErrorCheckSerializer( err, many=False)
 
-                return Response(serializer.data)
+            return Response(serializer.data)
 
 
-        error_message = 'Input in fields not valid, try again please '
+        error_message = 'Invalid login, try again please '
         
         err = {
             'error_message' : error_message
@@ -274,28 +279,44 @@ class ResetPhone(APIView):
     
     def post(self, request):
         
+        account = get_account(request)
 
-        phone = request.POST.get("phone","")
-        
-        if request.user.is_authenticated:
-            user = User.objects.get(username = request.user)
-            email = user.username
+        if account:
+            
+            phone = request.POST.get("phone","")
+            account.phone = phone
+            account.save()
 
+            code = 11
 
-        account = Account.objects.get(email=email)
-        account.phone = phone
-        account.save()
-
-        code = 11
-
-        success = {
+            success = {
             'code' : code
-        }
+            }
 
-        serializer = SuccessCodeSerializer(success, many = False)
+            serializer = SuccessCodeSerializer(success, many = False)
 
-        return Response(serializer.data)
+            return Response(serializer.data)
 
+        else:
+
+            error_message = 'Oops something went wrong, try again'
+        
+            err = {
+                'error_message' : error_message
+            }
+            serializer = ErrorCheckSerializer( err, many=False)
+
+            return Response(serializer.data)
+                
+
+        
+        #if request.user.is_authenticated:
+        #    user = User.objects.get(username = request.user)
+        #   email = user.username
+
+
+        #account = Account.objects.get(email=email)
+        
 
 
 
@@ -318,24 +339,30 @@ class ResetDP(APIView):
 
         display_pic = request.FILES.get("display_pic","")
         
-        if request.user.is_authenticated:
-            user = User.objects.get(username = request.user)
-            email = user.username
+        try: 
+            account = get_account(request)
+            account.display_pic = display_pic
+            account.save()
 
+            code = 11
 
-        account = Account.objects.get(email=email)
-        account.display_pic = display_pic
-        account.save()
+            success = {
+                'code' : code
+            }
 
-        code = 11
+            serializer = SuccessCodeSerializer(success, many = False)
 
-        success = {
-            'code' : code
-        }
+            return Response(serializer.data)
 
-        serializer = SuccessCodeSerializer(success, many = False)
+        except: 
 
-        return Response(serializer.data)
+            error_message = 'Ye! something broke, please try again '
+            err = {
+                'error_message' : error_message
+            }
+            serializer = ErrorCheckSerializer( err, many=False)
+
+            return Response(serializer.data)
 
 
 
@@ -362,12 +389,9 @@ class UpdatePassword(APIView):
 
         if new_password == confirm_password:
 
-            if request.user.is_authenticated:
-                user = User.objects.get(username = request.user)
-                email = user.username
-
-
-                account = Account.objects.get(email=email)
+            
+            try:
+                account = get_account(request)
                 password = account.password
 
                 if old_password == int(password):
@@ -403,6 +427,18 @@ class UpdatePassword(APIView):
                     return Response(serializer.data)
 
 
+            except:
+
+                error_message = 'Ye! something went wrong'
+
+                err = {
+                    'error_message' : error_message
+                }
+
+                serializer = ErrorCheckSerializer(err, many=False)
+
+                return Response(serializer.data)
+
         else:
 
             error_message = 'Passwords do not match'
@@ -414,6 +450,7 @@ class UpdatePassword(APIView):
             serializer = ErrorCheckSerializer(err, many=False)
 
             return Response(serializer.data)
+
         
        
 
@@ -441,10 +478,14 @@ class IsLoggedIn(APIView):
 
         signed_in = False
 
-        if request.user.is_authenticated:
-
+        try:
+            account = get_account(request)
             signed_in = True
 
+        except:
+
+            pass
+            
 
         return Response(signed_in)
 
@@ -452,14 +493,7 @@ class IsLoggedIn(APIView):
     
     def post(self, request):
 
-        signed_in = False
-
-        if request.user.is_authenticated():
-
-            signed_in = True
-
-
-        return Response(signed_in)
+        pass
 
     
 
@@ -483,24 +517,33 @@ class UpdateDP(APIView):
     
     def post(self, request):
         
-        if request.session.has_key('email'):
-            email = request.session['email']
 
-        else :
-            email = 'dretzam@gmail.com'
-
-        try:
-            account = Account.objects.get(email=email)
-        except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        
         display_pic = request.FILES.get("display_pic","")
-        account.display_pic = display_pic
-        account.save()
+        
+        try: 
+            account = get_account(request)
+            account.display_pic = display_pic
+            account.save()
 
-        return HttpResponseRedirect('http://localhost:3000/profile/')
+            code = 11
 
+            success = {
+                'code' : code
+            }
+
+            serializer = SuccessCodeSerializer(success, many = False)
+
+            return Response(serializer.data)
+
+        except: 
+
+            error_message = 'Ye! something broke, please try again '
+            err = {
+                'error_message' : error_message
+            }
+            serializer = ErrorCheckSerializer( err, many=False)
+
+            return Response(serializer.data)
 
 
 
@@ -522,34 +565,47 @@ class UpdatePassword(APIView):
     
     def post(self, request):
         
-        
-        if request.session.has_key('email'):
-            email = request.session['email']
-
-        else :
-            email = 'dretzam@gmail.com'
-
         try:
-            account = Account.objects.get(email=email)
-        except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            account = get_account(request)
+            old_password = request.POST.get("old_password","")
+            new_password = request.POST.get("new_password","")
+            confirm_password = request.POST.get("confirm_password","")
 
-        
-        old_password = request.POST.get("old_password","")
-        new_password = request.POST.get("new_password","")
-        confirm_password = request.POST.get("confirm_password","")
+            if old_password == account.password:
 
-        if old_password == account.password:
+                if new_password == confirm_password:
 
-            if new_password == confirm_password:
+                    account.password = make_password(new_password)
+                    account.save()
 
-                account.password = make_password(new_password)
-                account.save()
+                    code = 11
 
+                    success = {
+                        'code' : code
+                    }
 
-        
+                    serializer = SuccessCodeSerializer(success, many = False)
 
-        return HttpResponseRedirect('http://localhost:3000/profile/')
+                    return Response(serializer.data)
+
+                else:
+                    error_message = 'Ooouuu! passwords did not match'
+                    err = {
+                        'error_message' : error_message
+                    }
+                    serializer = ErrorCheckSerializer( err, many=False)
+
+                    return Response(serializer.data)
+
+        except: 
+
+            error_message = 'Ye! something broke, please try again '
+            err = {
+                'error_message' : error_message
+            }
+            serializer = ErrorCheckSerializer( err, many=False)
+
+            return Response(serializer.data)
 
 
 
@@ -568,17 +624,18 @@ class IsMyProfile(APIView):
 
         my_account = False
 
-        if request.user.is_authenticated:
-            user = User.objects.get(username = request.user)
-            email = user.username
+        try:
+            account = get_account(request)
+            account_id = account.id
 
-        account = Account.objects.get(email=email)
-        account_id = account.id
-
-        if account_id == int(profile_id) :
-            my_account = True
+            if account_id == int(profile_id) :
+                my_account = True
 
 
+        except:
+            pass
+
+        
         return Response(my_account)
 
     def post(self, request, profile_id):
@@ -605,14 +662,17 @@ class MyAccountID(APIView):
 
     def get(self, request):
 
-        if request.user.is_authenticated:
-            user = User.objects.get(username = request.user)
-            email = user.username
+        try: 
+            account = get_account(request)
+            account_id = account.id
 
-        account = Account.objects.get(email=email)
-        account_id = account.id
+            return Response(account_id)
 
-        return Response(account_id)
+        except:
+            pass
+
+        return Response(1)
+
 
     def post(self, request):
         pass
@@ -756,7 +816,7 @@ class SubCategoryView(APIView):
 
     def get(self,request, category_id):
 
-        subcategory = SubCategory.objects.filter( category_id = category_id)
+        subcategory = SubCategory.objects.filter( category_id = category_id )
         serializer = SubCategorySerializer(subcategory, many=True)
 
         return Response( serializer.data )
@@ -764,6 +824,89 @@ class SubCategoryView(APIView):
     def post(self,request, category_id):
 
         pass
+
+
+
+
+
+
+
+class SubCategoryMain(APIView):
+
+    def get(self,request):
+
+        subcategory = SubCategory.objects.all()
+        serializer = SubCategorySerializer(subcategory, many=True)
+
+        return Response( serializer.data )
+
+    def post(self,request, category_id):
+
+        pass
+
+
+
+
+
+
+
+
+class SubCategoryProduct(APIView):
+
+    def get(self, request, campus_id, subcategory_id):
+
+        try:
+            if subcategory_id == '99':
+                product = Product.objects.all()[:21]
+
+            else:
+                subcategory = SubCategory.objects.get(id = subcategory_id)
+                category_id = subcategory.category_id
+                product = Product.objects.filter(category_id = category_id)[:21]
+
+            serializer = ProductSnippetSerializer(product, many=True)
+            return Response( serializer.data )
+        except:
+            bug = []
+            return Response(bug)
+
+    def post(self,request, category_id):
+
+        pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class SubCategoryIcon(APIView):
+
+    def get(self, request):
+
+        subcategory = SubCategory.objects.all()
+        serializer = SubCategorySerializer(subcategory, many=True)
+
+        return Response( serializer.data )
+
+    
+    def post(self, request):
+        
+        pass
+
+
+
+
+
 
 
 
@@ -789,6 +932,77 @@ class CampusView(APIView):
     def post(self,request):
 
         pass
+
+
+
+
+
+
+
+
+
+
+class CampusSearch(APIView):
+
+    def get(self, request):
+        pass
+        
+    
+    def post(self, request):
+        
+        key_word = request.POST.get("key_word","")
+
+        campus = Campus.objects.filter(campus__icontains = key_word) | Campus.objects.filter(campus_code__icontains = key_word)
+        serializer = CampusSerializer(campus, many=True)
+
+        return Response(serializer.data)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class CategoryProduct(APIView):
+
+    def get(self, request, campus_id, category_id, show_more):
+
+        if show_more == '1':
+            if category_id == '99' :
+                product = Product.objects.filter(campus_id = campus_id)[:9]
+
+            else: 
+                product = Product.objects.filter(campus_id = campus_id, category_id = category_id)[:9]
+
+        else:
+            if category_id == '99' :
+                product = Product.objects.filter(campus_id = campus_id)[:21]
+
+            else: 
+                product = Product.objects.filter(campus_id = campus_id, category_id = category_id)[:21]
+    
+        serializer = ProductSnippetSerializer(product, many=True)
+        return Response(serializer.data)
+
+
+       
+
+    
+    def post(self, request):
+        pass
+
+
+
+
+
 
 
 
@@ -870,9 +1084,9 @@ class NewProductView(APIView):
                 media_register.product = newProduct
                 media_register.save()
             
-        id = int(newProduct.id)
+        id = str(newProduct.id)
 
-        return HttpResponseRedirect('http://localhost:3000/product/' + id)
+        return HttpResponseRedirect('http://127.0.0.1:3000/product/' + id)
        
 
 
@@ -1012,49 +1226,19 @@ class EShopProductList(APIView):
 
 class Search(APIView):
 
-    def get(self, request,campus_id, category_id, search_phrase):
+    def get(self, request,campus_id, category_id):
 
-        results = []
-      
-        if category_id != '99' :
-
-            buffer_result = Product.objects.filter(product_name__icontains = search_phrase,category_id=category_id, campus_id = campus_id) | Product.objects.filter(description__icontains = search_phrase,category_id=category_id, campus_id = campus_id) 
-
-        else:
-             
-            buffer_result = Product.objects.filter(product_name__icontains = search_phrase, campus_id = campus_id) | Product.objects.filter(description__icontains = search_phrase , campus_id = campus_id)
-     
-
-        for buffer in buffer_result :
-
-            product_id = buffer.id
-            product_name = buffer.product_name
-            product_image = buffer.product_image
-            starting_price = buffer.starting_price
-
-            context_list = {
-                'product_id': product_id,
-                'product_name': product_name,
-                'product_image' : product_image,
-                'starting_price' : starting_price,
-            }
-
-            results.append(context_list)
-
-               
-
-        serializer = ResultListSerializer(results, many=True)
-
-        return Response(serializer.data)
+        pass
 
     
-    def post(self, request,campus_id, category_id, search_phrase):
+    def post(self, request,campus_id, category_id):
 
+        search_phrase = request.POST.get("search_phrase", "")
         results = []
 
-        if category_id != 99 :
+        if category_id != '99' :
 
-            buffer_result =  Product.objects.filter(product_name__icontains = search_phrase,category_id=category_id, campus_id = campus_id) | Product.objects.filter(description__icontains = search_phrase,category_id=category_id, campus_id = campus_id) 
+            buffer_result =  Product.objects.filter(product_name__icontains = search_phrase,category_id=category_id, campus_id = campus_id) | Product.objects.filter(description__icontains = search_phrase, category_id=category_id, campus_id = campus_id) 
 
         else:
              
@@ -1063,7 +1247,7 @@ class Search(APIView):
 
         for buffer in buffer_result :
 
-            product_id = buffer.product_id
+            product_id = buffer.id
             product_name = buffer.product_name
             product_image = buffer.product_image
             starting_price = buffer.starting_price
@@ -1097,14 +1281,24 @@ class Search(APIView):
 
 class TrendingView(APIView):
 
-    def get(self, request, campus_id, category):
-        category = Category.objects.get(url_name = category)
+    def get(self, request, campus_id, trending_url):
 
-        trending = Trending.objects.filter(category_id = category.id, campus_id = campus_id)[:12] 
+        try:
+            category = Category.objects.get(url_name = trending_url)
+            trending = Product.objects.filter(category_id = category.id, campus_id = campus_id)[:8] 
 
-        serializer = TrendSerializer(trending, many=True)
+            serializer = TrendSerializer(trending, many=True)
 
-        return Response(serializer.data)
+            return Response(serializer.data)
+
+        except:
+            pass
+
+        empty_array = []
+
+        return Response(empty_array)
+
+        
 
     def post(self, request, campus_id, category):
         pass
@@ -1640,48 +1834,46 @@ class UnreadMessages(APIView):
 
     def get(self, request):
 
-        if request.user.is_authenticated:
-            user = User.objects.get(username = request.user)
-            email = user.username
+        try:
+            account = get_account(request)
+            account_id = account.id
+       
         
-        else:
-            email = 'dretzam@gmail.com'
+            unread_msg = EHaggler.objects.filter(account_1 = account_id) | EHaggler.objects.filter(account_2 = account_id)
 
-        account = Account.objects.get( email = email )
-        account_id = account.id
+            count = 0
+            for msg in unread_msg :
 
-        
-        unread_msg = EHaggler.objects.filter(account_1 = account_id) | EHaggler.objects.filter(account_2 = account_id)
+                if Messenger.objects.filter(ehaggler_id = msg.id, messenger_id = account_id).exists:
+                    pass
 
-        count = 0
-        for msg in unread_msg :
+                else:
 
-            if Messenger.objects.filter(ehaggler_id = msg.id, messenger_id = account_id).exists:
-                pass
+                    unread = Messenger.objects.filter(ehaggler_id = msg.id, seen = False).count
 
-            else:
-
-                unread = Messenger.objects.filter(ehaggler_id = msg.id, seen = False).count
-
-                count += unread
+                    count += unread
 
         
 
-        code = count
+            code = count
 
-        success = {
-            'code' : code
-        }
+            success = {
+                'code' : code
+            }
 
-        serializer = SuccessCodeSerializer(success, many = False)
+            serializer = SuccessCodeSerializer(success, many = False)
+
+            return Response(serializer.data)
+             
+        except:
+            code = 0
+            success = {
+                'code' : code
+            }
+
+            serializer = SuccessCodeSerializer(success, many = False)
 
         return Response(serializer.data)
-
-
-
-
-        control = 'control'
-        return Response(control)
         
         
 
@@ -1716,68 +1908,96 @@ class NewEShop(APIView):
 
     def post(self, request):
 
-        if request.user.is_authenticated:
-            user = User.objects.get(username = request.user)
-            email = user.username
-
-
-        account = Account.objects.get(email = email)
-        account_id = account.id
-
-        name = request.POST.get("eshop_name","")
-
         try:
-            eshop_exist = EShop.objects.get(account_id = account_id)
+            account = get_account(request)
+            account_id = account.id
 
-            error_message = 'Oops looks like this account has an e-shop already'
+            category = request.POST.getlist("category","")
+            name = request.POST.get("eshop_name","")
+            about = request.POST.get("about","")
 
-            err = {
-                'error_message': error_message
-            }
+            try:
+                eshop_exist = EShop.objects.get(account_id = account_id)
 
-            serializer = ErrorCheckSerializer(err, many=False)
+                error_message = 'Oops looks like this account has an e-shop already'
 
-            return Response(serializer.data)
+                err = {
+                    'error_message': error_message
+                }
 
-        
-        except:
-            pass
+                serializer = ErrorCheckSerializer(err, many=False)
 
-        
-        
-        try:
-            eshop_name_exist = EShop.objects.get(name = name)
-
-            error_message = 'Owww, this e-shop name has been taking already, try again, pls'
-
-            err = {
-                'error_message': error_message
-            }
-
-            serializer = ErrorCheckSerializer(err, many=False)
-
-            return Response(serializer.data)
+                return Response(serializer.data)
 
         
-        except:
-            pass
+            except:
+                pass
 
+
+        
+        
+            try:
+                eshop_name_exist = EShop.objects.get(name = name)
+
+                error_message = 'Owww, this e-shop name has been taking already, try again, pls'
+
+                err = {
+                    'error_message': error_message
+                }
+
+                serializer = ErrorCheckSerializer(err, many=False)
+
+                return Response(serializer.data)
+
+        
+            except:
+                pass
+
+
+            try:
+
+                eshop = EShop()
+                eshop.account = account
+                eshop.name = name
+                eshop.about = about
+                eshop.save()
+
+
+                for idd in category:
+                    eshop_category = EShopCategory()
+                    eshop_category.eshop = eshop 
+                    eshop_category.category = idd
+
+
+                code = eshop.id
+
+                success = {
+                    'code' : code
+                }
+
+                serializer = SuccessCodeSerializer(success, many=False)
+
+                return Response(serializer.data)
+
+            except:
+                pass
        
 
-        eshop = EShop()
-        eshop.account = account
-        eshop.name = name
-        eshop.save()
+            
 
-        code = eshop.id
+        except:
+            
+            error_message = 'Ye, something went wrong, please try again'
 
-        success = {
-            'code' : code
-        }
+            err = {
+                'error_message': error_message
+            }
 
-        serializer = SuccessCodeSerializer(success, many=False)
+            serializer = ErrorCheckSerializer(err, many=False)
 
-        return Response(serializer.data)
+            return Response(serializer.data)
+
+
 
 
 
@@ -1794,24 +2014,22 @@ class HaveEShop(APIView):
 
     def get(self, request):
 
-        if request.user.is_authenticated:
-            user = User.objects.get(username = request.user)
-            email = user.username
-
-
-        account = Account.objects.get(email = email)
-        account_id = account.id
-
         code = False
 
-        try :
+        try:
+            account = get_account(request)
+            account_id = account.id
 
-            eshop = EShop.objects.get(account_id = account_id)
-            code = True
+            try :
 
+                eshop = EShop.objects.get(account_id = account_id)
+                code = True
+
+            except:
+                pass
+        
         except:
             pass
-
         
         return Response(code)
 
