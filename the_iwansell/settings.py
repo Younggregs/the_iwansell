@@ -25,7 +25,7 @@ SECRET_KEY = 'f1m_(fxb*v+!ynb0yqqoe=h@h3q(!rq6pugb4uk9((5t3ehfvx'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [ '127.0.0.1','165.22.140.170', 'iwansell.com', 'www.iwansell.com']
 
 # Application definition
 
