@@ -128,6 +128,16 @@ class EShopSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+    
+class AboutEShopSerializer(serializers.Serializer):
+
+    id = serializers.IntegerField()
+    boss = serializers.CharField()
+    phone = serializers.CharField()
+
+
+
+
 class EShopExistSerializer(serializers.Serializer):
 
     eshop_exist = serializers.BooleanField()

@@ -44,6 +44,9 @@ urlpatterns = [
     #iwansell/ismyeshop/eshop_id
     url(r'^my_eshopid/$',views.MyEShopID.as_view(), name = 'my-eshop-id'),
 
+    #iwansell/about_eshop/eshop_id
+    url(r'^about_eshop/(?P<eshop_id>[0-9]+)/$',views.AboutEShop.as_view(), name = 'about_eshop'),
+
     #iwansell/category
     url(r'^category/$',views.CategoryView.as_view(), name = 'category'),
 
