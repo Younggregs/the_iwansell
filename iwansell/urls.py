@@ -41,8 +41,14 @@ urlpatterns = [
     #iwansell/ismyeshop/eshop_id
     url(r'^ismyeshop/(?P<eshop_id>[0-9]+)/$',views.IsMyEShop.as_view(), name = 'is-my-eshop'),
 
-    #iwansell/ismyeshop/eshop_id
+    #iwansell/ismyeshop/
     url(r'^my_eshopid/$',views.MyEShopID.as_view(), name = 'my-eshop-id'),
+
+    #iwansell/eshop_list/campus_id
+    url(r'^eshop_list/(?P<campus_id>[0-9]+)/$',views.EShopList.as_view(), name = 'eshop_list'),
+
+    #iwansell/eshop_subcategory/eshop_id
+    url(r'^eshop_subcategory/(?P<eshop_id>[0-9]+)/$',views.EShopSubCategory.as_view(), name = 'eshop-subcategory'),
 
     #iwansell/about_eshop/eshop_id
     url(r'^about_eshop/(?P<eshop_id>[0-9]+)/$',views.AboutEShop.as_view(), name = 'about_eshop'),

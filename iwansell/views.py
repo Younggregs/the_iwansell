@@ -707,17 +707,15 @@ class IsMyEShop(APIView):
 
         my_eshop = False
 
-        if request.user.is_authenticated:
-            user = User.objects.get(username = request.user)
-            email = user.username
+        try:
+            account = get_account(request)
+            eshop = EShop.objects.get(id = eshop_id)
 
+            if account.id == int(eshop.account_id):
+                my_eshop = True
 
-        account = Account.objects.get(email=email)
-
-        eshop = EShop.objects.get(id = eshop_id)
-
-        if int(account.id) == int(eshop.account_id):
-            my_eshop = True
+        except:
+            pass
 
 
         return Response(my_eshop)
@@ -728,6 +726,9 @@ class IsMyEShop(APIView):
     
     def post(self, request, eshop_id):
         pass
+
+
+
 
 
 
@@ -2275,10 +2276,62 @@ class NewEShopProduct(APIView):
                     pass
 
     
-        id = int(eshop_id)
+        id = str(eshop_id)
             
 
-        return HttpResponseRedirect('http://localhost:3000/eshop/' + id )
+        return HttpResponseRedirect('http://127.0.0.1:3000/eshop/' + id )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class EShopList(APIView):
+
+    def get(self, request, campus_id):
+        
+        eshoplist = EShop.objects.all()
+
+        serializer = EShopSerializer(eshoplist, many = True)
+
+        return Response(serializer.data)
+
+    
+
+    def post(self, request, campus_id):
+        
+        eshop_name = request.POST.get("eshop_name","")
+
+        eshoplist = EShop.objects.filter(name__icontains = eshop_name)
+
+        serializer = EShopSerializer(eshoplist, many = True)
+
+        return Response(serializer.data)
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2368,17 +2421,15 @@ class EShopSubCategory(APIView):
                 id = product.subcategory_id
                 sub_category = SubCategory.objects.get(id = id)
                 name = sub_category.name
+                image = sub_category.image
 
                 buffer = {
                     'id' : id,
                     'name' : name,
+                    'image' : image
                 }
 
                 store.append(buffer)
-
-
-           
-            
 
 
         serializer = SubCategorySerializer( store, many=True)
