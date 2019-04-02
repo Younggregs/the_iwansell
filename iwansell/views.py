@@ -16,7 +16,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Account , Category, Media, Product, Campus, Sponsored, EHaggler, Messenger, EShop, SubCategory, EShopProduct, RateReview, ClientRateReview, EShopRateReview, FavoriteClient, FavoriteProduct, FavoriteEShop, Trending, ForgotPassword
-from .serializers import AccountSerializer, AddAccountSerializer,SignInSerializer, CategorySerializer, ResultListSerializer,CampusSerializer, TrendSerializer, SponsoredSerializer, ProductSerializer,MessageSerializer, HaggleClientSerializer, EShopSerializer, EShopExistSerializer, SubCategorySerializer, ClientRRSerializer, EShopRRSerializer, ProductImagesSerializer, ProductVideoSerializer, EShopStoreSerializer, ForgotPasswordSerializer, ErrorCheckSerializer, SuccessCodeSerializer, FavoriteListClient, FavoriteListEShop, FavoriteListProduct, ProductSnippetSerializer
+from .serializers import AccountSerializer, AddAccountSerializer,SignInSerializer, CategorySerializer, ResultListSerializer,CampusSerializer, TrendSerializer, SponsoredSerializer, ProductSerializer,MessageSerializer, HaggleClientSerializer, EShopSerializer, EShopExistSerializer, SubCategorySerializer, ClientRRSerializer, EShopRRSerializer, ProductImagesSerializer, ProductVideoSerializer, EShopStoreSerializer, ForgotPasswordSerializer, ErrorCheckSerializer, SuccessCodeSerializer, FavoriteListClient, FavoriteListEShop, FavoriteListProduct, ProductSnippetSerializer, AboutEShopSerializer
 import random
 import string
 
@@ -2075,6 +2075,59 @@ class EShopView(APIView):
     
     def post(self, request):
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+class AboutEShop(APIView):
+
+    def get(self, request, eshop_id):
+
+        try:
+            eshop = EShop.objects.get(id = eshop_id)
+            account_id = eshop.account_id
+            account = Account.objects.get(id = account_id)
+
+            id = account.id
+            boss = account.firstname + ' ' + account.lastname
+            phone = account.phone
+
+            boss_info = {
+                'id' : id,
+                'boss' : boss,
+                'phone' : phone
+            }   
+
+            serializer = AboutEShopSerializer( boss_info, many = False)
+            
+            return Response( serializer.data )
+        
+        except:
+            pass
+
+        
+        return Response(False)
+
+
+    def post(get, request, eshop_id):
+        pass
+
+
+
+
+
+
+
+
 
 
 
