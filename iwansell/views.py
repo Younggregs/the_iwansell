@@ -2577,21 +2577,24 @@ class EShopListCategory(APIView):
     def get(self, request, campus_id, category_id):
 
         if category_id == 99:
-            eshoplist = EShopCategory.objects.all()
+            eshoplist = EShop.objects.all()
+
+            serializer = EShopSerializer(eshoplist, many=True)
+            return Response(serializer.data)
 
         else:
             eshoplist = EShopCategory.objects.filter(category = category_id)
 
+            bucketlist = []
+            for eshop in eshoplist:
+                shop = EShop.objects.get(id = eshop.eshop_id)
+                bucketlist.append(shop)
         
+            serializer = EShopSerializer(bucketlist, many = True)
 
-        bucketlist = []
-        for eshop in eshoplist:
-            shop = EShop.objects.get(id = eshop.eshop_id)
-            bucketlist.append(shop)
+            return Response(serializer.data)
 
-        serializer = EShopSerializer(bucketlist, many = True)
-
-        return Response(serializer.data)
+        
 
 
     def post(self, request, campus_id, subcategory_id):
