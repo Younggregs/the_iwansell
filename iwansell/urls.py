@@ -41,7 +41,10 @@ urlpatterns = [
     #iwansell/ismyeshop/eshop_id
     url(r'^ismyeshop/(?P<eshop_id>[0-9]+)/$',views.IsMyEShop.as_view(), name = 'is-my-eshop'),
 
-    #iwansell/ismyeshop/
+    #iwansell/eshop_category/eshop_id
+    url(r'^eshop_category/(?P<eshop_id>[0-9]+)/$',views.EShopCategoryView.as_view(), name = 'eshop-category-view'),
+
+    #iwansell/my_eshopid/
     url(r'^my_eshopid/$',views.MyEShopID.as_view(), name = 'my-eshop-id'),
 
     #iwansell/eshop_list/campus_id
@@ -105,7 +108,7 @@ urlpatterns = [
     url(r'^search/(?P<campus_id>[0-9]+)/(?P<category_id>[0-9]+)/$',views.Search.as_view(), name = 'search'),
 
     #iwansell/trending
-    url(r'^trending/(?P<campus_id>[0-9]+)/(?P<trending_url>\w+)/$',views.TrendingView.as_view(), name = 'trending-view'),
+    url(r'^trending/(?P<campus_id>[0-9]+)/(?P<trending_url>\w+)/$',views.TrendingView.as_view(), name = 'trending'),
 
     #iwansell/sponsored
     url(r'^sponsored/(?P<campus_id>[0-9]+)/$',views.SponsoredView.as_view(), name = 'sponsored'),

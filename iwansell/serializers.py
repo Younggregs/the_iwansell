@@ -92,6 +92,12 @@ class ProductSerializer(serializers.Serializer):
     display_pic = serializers.CharField()
 
 
+
+class EShopCategorySerializer(serializers.Serializer):
+    
+    category_name = serializers.CharField()
+
+
 class ProductSnippetSerializer(serializers.ModelSerializer):
 
     class Meta:

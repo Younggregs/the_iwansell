@@ -16,7 +16,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Account , Category, Media, Product, Campus, Sponsored, EHaggler, Messenger, EShop, SubCategory, EShopProduct, EShopCategory, RateReview, ClientRateReview, EShopRateReview, FavoriteClient, FavoriteProduct, FavoriteEShop, Trending, Blog, ForgotPassword
-from .serializers import AccountSerializer, AddAccountSerializer,SignInSerializer, CategorySerializer, ResultListSerializer,CampusSerializer, TrendSerializer, SponsoredSerializer, ProductSerializer,MessageSerializer, HaggleClientSerializer, EShopSerializer, EShopExistSerializer, SubCategorySerializer, ClientRRSerializer, EShopRRSerializer, ProductImagesSerializer, ProductVideoSerializer, EShopStoreSerializer, ForgotPasswordSerializer, ErrorCheckSerializer, SuccessCodeSerializer, FavoriteListClient, FavoriteListEShop, FavoriteListProduct, ProductSnippetSerializer, AboutEShopSerializer, BlogSerializer
+from .serializers import AccountSerializer, AddAccountSerializer,SignInSerializer, CategorySerializer, ResultListSerializer,CampusSerializer, TrendSerializer, SponsoredSerializer, ProductSerializer,MessageSerializer, HaggleClientSerializer, EShopSerializer, EShopExistSerializer, SubCategorySerializer, ClientRRSerializer, EShopRRSerializer, ProductImagesSerializer, ProductVideoSerializer, EShopStoreSerializer, ForgotPasswordSerializer, ErrorCheckSerializer, SuccessCodeSerializer, FavoriteListClient, FavoriteListEShop, FavoriteListProduct, ProductSnippetSerializer, AboutEShopSerializer, BlogSerializer, EShopCategorySerializer
 import random
 import string
 
@@ -89,7 +89,8 @@ def get_account(request):
         return account
 
     else:
-        pass
+        
+        return False
 
 
 
@@ -145,7 +146,7 @@ class AddAccount(APIView):
 
                 Account.objects.get(phone = phone)
 
-                error_message = 'Oops an account with that phone already exist'
+                error_message = 'Oops an account with that username already exist'
                 err = {
                     'error_message' : error_message
                 }
@@ -863,12 +864,17 @@ class IsMyEShop(APIView):
             account = get_account(request)
             eshop = EShop.objects.get(id = eshop_id)
 
-            if int(account.id) == int(eshop.account):
-                my_eshop = True
+            if account:
+                 if int(account.id) == eshop.account_id :
+                    my_eshop = True
+            
+            else:
+                my_eshop = 0
+
 
         except:
             pass
-
+        
 
         return Response(my_eshop)
         
@@ -1363,7 +1369,7 @@ class NewProductView(APIView):
             
         id = str(newProduct.id)
 
-        return HttpResponseRedirect('https://iwansell.com/product/' + id)
+        return HttpResponseRedirect('http://127.0.0.1:3000/product/' + id)
        
 
 
@@ -1562,7 +1568,7 @@ class TrendingView(APIView):
 
         try:
             category = Category.objects.get(url_name = trending_url)
-            trending = Product.objects.filter(category = category.id)[:8] 
+            trending = Product.objects.filter(category_id = category.id, campus_id = campus_id)[:8] 
 
             serializer = TrendSerializer(trending, many=True)
 
@@ -2189,7 +2195,7 @@ class NewEShop(APIView):
             account = get_account(request)
             account_id = account.id
 
-            category = request.POST.get("category","")
+            category = request.POST.getlist("category","")
             name = request.POST.get("eshop_name","")
             about = request.POST.get("about","")
 
@@ -2297,8 +2303,13 @@ class HaveEShop(APIView):
             account = get_account(request)
             account_id = account.id
 
-            eshop = EShop.objects.get(account_id = account_id)
-            code = True
+            try :
+
+                eshop = EShop.objects.get(account_id = account_id)
+                code = True
+
+            except:
+                pass
         
         except:
             pass
@@ -2419,22 +2430,22 @@ class EShopExist(APIView):
 
     def get(self, request):
 
-        try:
-            account = get_account(request)
-            account_id = account.id
+        if request.user.is_authenticated:
+            user = User.objects.get(username = request.user)
+            email = user.username
 
-            eshop_exist = EShop.objects.filter(account_id = account_id).exists
 
-            json_object = {
-                'eshop_exist' : eshop_exist
-            }
+        account = Account.objects.get(email = email)
+        account_id = account.id
 
-            serializer = EShopExistSerializer( json_object, many = False)
-            return Response( serializer.data )
-        except:
-            pass
+        eshop_exist = EShop.objects.filter(account_id = account_id).exists
 
-        return Response(False)
+        json_object = {
+            'eshop_exist' : eshop_exist
+        }
+
+        serializer = EShopExistSerializer( json_object, many = False)
+        return Response( serializer.data )
 
 
     def post(get, request):
@@ -2550,7 +2561,52 @@ class NewEShopProduct(APIView):
         id = str(eshop_id)
             
 
-        return HttpResponseRedirect('https://iwansell.com/eshop/' + id )
+        return HttpResponseRedirect('http://127.0.0.1:3000/eshop/' + id )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class EShopCategoryView(APIView):
+
+    def get(self, request, eshop_id):
+
+        eshop_category = EShopCategory.objects.filter(eshop = eshop_id)
+
+        dumb = []
+        for category in eshop_category:
+            item = Category.objects.get(id = category.category_id)
+            name = item.name
+
+            bucketlist = {
+                'category_name': name
+            }
+
+            dumb.append(bucketlist)
+
+
+        serializer = EShopCategorySerializer(dumb, many = True)
+
+        return Response(serializer.data)
+
+
+    def post(self, request, campus_id, subcategory_id):
+        pass
+
 
 
 
@@ -3631,7 +3687,7 @@ class ForgotPasswordView(APIView):
             new_reset.email = email
             new_reset.save()
 
-            message = 'Hey dear! You are nearly done with your password reset process, Follow this link to reset your password https://iwansell.com/reset_password/' +  str(reset_code) + ' You have done well'
+            message = 'Hey dear! You are nearly done with your password reset process, Follow this link to reset your password http://127.0.0.1:3000/reset_password/' +  str(reset_code) + ' You have done well'
             email = EmailMessage('Your password reset details from Iwansell', message, to=[email])
             email.send()
 
