@@ -2576,7 +2576,7 @@ class EShopListCategory(APIView):
 
     def get(self, request, campus_id, category_id):
 
-        if category_id == '99':
+        if category_id == 99:
             eshoplist = EShopCategory.objects.all()
 
         else:
