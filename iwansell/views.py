@@ -1363,7 +1363,7 @@ class NewProductView(APIView):
             
         id = str(newProduct.id)
 
-        return HttpResponseRedirect('http://127.0.0.1:3000/product/' + id)
+        return HttpResponseRedirect('https://iwansell.com/product/' + id)
        
 
 
@@ -2550,7 +2550,7 @@ class NewEShopProduct(APIView):
         id = str(eshop_id)
             
 
-        return HttpResponseRedirect('http://127.0.0.1:3000/eshop/' + id )
+        return HttpResponseRedirect('https://iwansell.com/eshop/' + id )
 
 
 
@@ -3622,7 +3622,7 @@ class ForgotPasswordView(APIView):
             new_reset.email = email
             new_reset.save()
 
-            message = 'Hey dear! You are nearly done with your password reset process, Follow this link to reset your password http://127.0.0.1:3000/reset_password/' +  str(reset_code) + ' You have done well'
+            message = 'Hey dear! You are nearly done with your password reset process, Follow this link to reset your password https://iwansell.com/reset_password/' +  str(reset_code) + ' You have done well'
             email = EmailMessage('Your password reset details from Iwansell', message, to=[email])
             email.send()
 
