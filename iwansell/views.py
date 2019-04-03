@@ -15,14 +15,37 @@ from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Account , Category, Media, Product, Campus, Sponsored, EHaggler, Messenger, EShop, SubCategory, EShopProduct, RateReview, ClientRateReview, EShopRateReview, FavoriteClient, FavoriteProduct, FavoriteEShop, Trending, ForgotPassword
-from .serializers import AccountSerializer, AddAccountSerializer,SignInSerializer, CategorySerializer, ResultListSerializer,CampusSerializer, TrendSerializer, SponsoredSerializer, ProductSerializer,MessageSerializer, HaggleClientSerializer, EShopSerializer, EShopExistSerializer, SubCategorySerializer, ClientRRSerializer, EShopRRSerializer, ProductImagesSerializer, ProductVideoSerializer, EShopStoreSerializer, ForgotPasswordSerializer, ErrorCheckSerializer, SuccessCodeSerializer, FavoriteListClient, FavoriteListEShop, FavoriteListProduct, ProductSnippetSerializer, AboutEShopSerializer
+from .models import Account , Category, Media, Product, Campus, Sponsored, EHaggler, Messenger, EShop, SubCategory, EShopProduct, EShopCategory, RateReview, ClientRateReview, EShopRateReview, FavoriteClient, FavoriteProduct, FavoriteEShop, Trending, Blog, ForgotPassword
+from .serializers import AccountSerializer, AddAccountSerializer,SignInSerializer, CategorySerializer, ResultListSerializer,CampusSerializer, TrendSerializer, SponsoredSerializer, ProductSerializer,MessageSerializer, HaggleClientSerializer, EShopSerializer, EShopExistSerializer, SubCategorySerializer, ClientRRSerializer, EShopRRSerializer, ProductImagesSerializer, ProductVideoSerializer, EShopStoreSerializer, ForgotPasswordSerializer, ErrorCheckSerializer, SuccessCodeSerializer, FavoriteListClient, FavoriteListEShop, FavoriteListProduct, ProductSnippetSerializer, AboutEShopSerializer, BlogSerializer
 import random
 import string
 
 
+
+
+
+
+
+
 IMAGE_FILE_TYPES = ['png', 'jpg', 'jpeg']
 VIDEO_FILE_TYPES = ['webm', 'mp4', 'ogg']
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -36,9 +59,21 @@ def index(request):
 
 
 
+
+
+
+
+
 def reset_code_generator(size=16, chars=string.ascii_uppercase + string.digits):
 
     return ''.join(random.choice(chars) for _ in range(size))
+
+
+
+
+
+
+
 
 
 
@@ -55,6 +90,29 @@ def get_account(request):
 
     else:
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -170,6 +228,30 @@ class AddAccount(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class SignIn(APIView):
 
     def get(self,request):
@@ -225,6 +307,24 @@ class SignIn(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class AccountDetail(APIView):
 
     def get(self,request,account_id):
@@ -262,6 +362,28 @@ class AccountDetail(APIView):
 
         account.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -309,14 +431,24 @@ class ResetPhone(APIView):
             return Response(serializer.data)
                 
 
-        
-        #if request.user.is_authenticated:
-        #    user = User.objects.get(username = request.user)
-        #   email = user.username
 
 
-        #account = Account.objects.get(email=email)
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -363,6 +495,26 @@ class ResetDP(APIView):
             serializer = ErrorCheckSerializer( err, many=False)
 
             return Response(serializer.data)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -711,7 +863,7 @@ class IsMyEShop(APIView):
             account = get_account(request)
             eshop = EShop.objects.get(id = eshop_id)
 
-            if account.id == int(eshop.account_id):
+            if int(account.id) == int(eshop.account):
                 my_eshop = True
 
         except:
@@ -741,27 +893,35 @@ class IsMyEShop(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class MyEShopID(APIView):
 
     def get(self, request):
 
 
         eshop_id = ''
-        if request.user.is_authenticated:
-            user = User.objects.get(username = request.user)
-            email = user.username
-
-
-        account = Account.objects.get(email=email)
-        account_id = account.id
-
-        try :
+        try:
+            account = get_account(request)
+            account_id = account.id
 
             eshop = EShop.objects.get(account_id = account_id)
             eshop_id = eshop.id
-
         except:
-
             pass
 
 
@@ -800,6 +960,122 @@ class CategoryView(APIView):
 
         pass
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class RecentBlogPost(APIView):
+
+    def get(self, request):
+        
+        try:
+            blog = Blog.objects.all()[:9]
+
+            serializer = BlogSerializer(blog, many=True)
+            return Response(serializer.data)
+        except:
+            pass
+
+        return Response(False)
+    
+
+    def post(self, request, blog_id):
+        pass
+
+
+
+
+
+
+
+
+
+
+
+class BlogPost(APIView):
+
+    def get(self, request, blog_id):
+        
+        try:
+            blog = Blog.objects.get(id = blog_id)
+
+            serializer = BlogSerializer(blog, many=False)
+            return Response(serializer.data)
+        except:
+            pass
+
+        return Response(False)
+    
+
+    def post(self, request, blog_id):
+        pass
+
+    
+
+
+class BlogTop(APIView):
+
+    def get(self, request):
+        
+        try:
+            blog = Blog.objects.get(blog_top = True)
+
+            serializer = BlogSerializer(blog, many=False)
+            return Response(serializer.data)
+        except:
+            pass
+
+        return Response(False)
+    
+
+    def post(self, request, blog_id):
+        pass
+
+
+
+
+
+
+class CategoryBlog(APIView):
+
+    def get(self, request, category_id):
+        
+        blog = Blog.objects.filter(category = category_id)
+
+        serializer = BlogSerializer(blog, many=True)
+        return Response(serializer.data)
+    
+
+    def post(self, request, blog_id):
+        pass
+
+
+
+
+
+class BlogSnippet(APIView):
+
+    def get(self, request):
+        
+        blog = Blog.objects.all()[:13]
+
+        serializer = BlogSerializer(blog, many=True)
+        return Response(serializer.data)
+    
+
+    def post(self, request, blog_id):
+        pass
 
 
 
@@ -2292,6 +2568,33 @@ class NewEShopProduct(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+class EShopListCategory(APIView):
+
+    def get(self, request, campus_id, category_id):
+
+        eshoplist = EShopCategory.objects.filter(category = category_id)
+
+        bucketlist = []
+        for eshop in eshoplist:
+            shop = EShop.objects.get(id = eshop.eshop_id)
+            bucketlist.append(shop)
+
+        serializer = EShopSerializer(bucketlist, many = True)
+
+        return Response(serializer.data)
+
+
+    def post(self, request, campus_id, subcategory_id):
+        pass
 
 
 

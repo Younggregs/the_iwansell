@@ -47,6 +47,9 @@ urlpatterns = [
     #iwansell/eshop_list/campus_id
     url(r'^eshop_list/(?P<campus_id>[0-9]+)/$',views.EShopList.as_view(), name = 'eshop_list'),
 
+    #iwansell/eshop_list_category
+    url(r'^eshop_list_category/(?P<campus_id>[0-9]+)/(?P<category_id>[0-9]+)/$',views.EShopListCategory.as_view(), name = 'eshop_list_category'),
+
     #iwansell/eshop_subcategory/eshop_id
     url(r'^eshop_subcategory/(?P<eshop_id>[0-9]+)/$',views.EShopSubCategory.as_view(), name = 'eshop-subcategory'),
 
@@ -175,6 +178,21 @@ urlpatterns = [
 
     #iwansell/get_campus
     url(r'^get_campus/$',views.GetCampus.as_view(), name = 'get-campus'),
+
+    #iwansell/blog_post
+    url(r'^blog_post/(?P<blog_id>[0-9]+)/$',views.BlogPost.as_view(), name = 'category-blog'),
+
+    #iwansell/category_blog 
+    url(r'^category_blog/(?P<category_id>[0-9]+)/$',views.CategoryBlog.as_view(), name = 'category-blog'),
+
+    #iwansell/blog_top
+    url(r'^blog_top/$',views.BlogTop.as_view(), name = 'blog-top'),
+
+    #iwansell/recent_blog_post
+    url(r'^recent_blog_post/$',views.RecentBlogPost.as_view(), name = 'recent-blog-post'),
+
+    #iwansell/blog_snippet
+    url(r'^blog_snippet/$',views.BlogSnippet.as_view(), name = 'blog-snippet'),
 
     #iwansell/forgot_password
     url(r'^forgot_password/$',views.ForgotPasswordView.as_view(), name = 'forgot-password'),

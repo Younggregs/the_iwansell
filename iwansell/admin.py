@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from .models import Account,Category, Media, Product, Campus, Sponsored, Trending, Messenger,EHaggler, SubCategory
+from .models import Account,Category, Media, Product, Campus, EShop, Sponsored, Trending, Messenger,EHaggler, Blog, SubCategory
 from django.contrib import admin
 
 # Register your models here.
@@ -14,3 +14,5 @@ admin.site.register(Messenger)
 admin.site.register(EHaggler)
 admin.site.register(SubCategory)
 admin.site.register(Media)
+admin.site.register(EShop)
+admin.site.register(Blog)

@@ -236,3 +236,24 @@ class EShopRateReview(models.Model):
     eshop = models.ForeignKey(EShop, on_delete=models.CASCADE)
 
 
+
+
+class Blog(models.Model):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    title = models.CharField(max_length= 150)
+    blog_post = models.TextField()
+    image = models.FileField(default='anon.png')
+    blog_top = models.BooleanField(default= False)
+    date = models.DateTimeField(default = timezone.now)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        ordering = ['date']
+
+    
+
+
+
+

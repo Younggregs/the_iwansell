@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Account, Category, SubCategory, Campus, Sponsored, Product, EShop, RateReview, Trending, Media, ForgotPassword
+from .models import Account, Category, SubCategory, Campus, Sponsored, Product, EShop, RateReview, Trending, Media, Blog, ForgotPassword
 
 class AccountSerializer(serializers.ModelSerializer):
 
@@ -32,6 +32,13 @@ class SubCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = SubCategory
         fields = ['id', 'name', 'image']
+
+
+class BlogSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Blog
+        fields = '__all__'
 
 
 class CampusSerializer(serializers.ModelSerializer):
