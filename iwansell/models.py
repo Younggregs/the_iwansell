@@ -14,7 +14,7 @@ class Campus(models.Model):
 
 class Account(models.Model):
     email = models.EmailField(default="iwansell@gmail.com")
-    password = models.CharField(max_length = 50)
+    password = models.CharField(max_length = 250)
     firstname = models.CharField(max_length = 30)
     lastname = models.CharField(max_length = 30)
     phone = models.CharField(max_length=11)
