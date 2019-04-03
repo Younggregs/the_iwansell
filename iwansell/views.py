@@ -143,9 +143,9 @@ class AddAccount(APIView):
 
             try:
 
-                Account.objects.get(email = email)
+                Account.objects.get(phone = phone)
 
-                error_message = 'Oops an account with that username already exist'
+                error_message = 'Oops an account with that phone already exist'
                 err = {
                     'error_message' : error_message
                 }
