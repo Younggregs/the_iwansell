@@ -2419,22 +2419,22 @@ class EShopExist(APIView):
 
     def get(self, request):
 
-        if request.user.is_authenticated:
-            user = User.objects.get(username = request.user)
-            email = user.username
+        try:
+            account = get_account(request)
+            account_id = account.id
 
+            eshop_exist = EShop.objects.filter(account_id = account_id).exists
 
-        account = Account.objects.get(email = email)
-        account_id = account.id
+            json_object = {
+                'eshop_exist' : eshop_exist
+            }
 
-        eshop_exist = EShop.objects.filter(account_id = account_id).exists
+            serializer = EShopExistSerializer( json_object, many = False)
+            return Response( serializer.data )
+        except:
+            pass
 
-        json_object = {
-            'eshop_exist' : eshop_exist
-        }
-
-        serializer = EShopExistSerializer( json_object, many = False)
-        return Response( serializer.data )
+        return Response(False)
 
 
     def post(get, request):
