@@ -2189,7 +2189,7 @@ class NewEShop(APIView):
             account = get_account(request)
             account_id = account.id
 
-            category = request.POST.getlist("category","")
+            category = request.POST.get("category","")
             name = request.POST.get("eshop_name","")
             about = request.POST.get("about","")
 
