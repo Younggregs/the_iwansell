@@ -1562,7 +1562,7 @@ class TrendingView(APIView):
 
         try:
             category = Category.objects.get(url_name = trending_url)
-            trending = Product.objects.filter(category_id = category.id, campus_id = campus_id)[:8] 
+            trending = Product.objects.filter(category = category.id)[:8] 
 
             serializer = TrendSerializer(trending, many=True)
 
@@ -2297,13 +2297,8 @@ class HaveEShop(APIView):
             account = get_account(request)
             account_id = account.id
 
-            try :
-
-                eshop = EShop.objects.get(account_id = account_id)
-                code = True
-
-            except:
-                pass
+            eshop = EShop.objects.get(account_id = account_id)
+            code = True
         
         except:
             pass

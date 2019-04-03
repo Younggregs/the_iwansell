@@ -105,7 +105,7 @@ urlpatterns = [
     url(r'^search/(?P<campus_id>[0-9]+)/(?P<category_id>[0-9]+)/$',views.Search.as_view(), name = 'search'),
 
     #iwansell/trending
-    url(r'^trending/(?P<campus_id>[0-9]+)/(?P<trending_url>\w+)/$',views.TrendingView.as_view(), name = 'trending'),
+    url(r'^trending/(?P<campus_id>[0-9]+)/(?P<trending_url>\w+)/$',views.TrendingView.as_view(), name = 'trending-view'),
 
     #iwansell/sponsored
     url(r'^sponsored/(?P<campus_id>[0-9]+)/$',views.SponsoredView.as_view(), name = 'sponsored'),
