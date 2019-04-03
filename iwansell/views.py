@@ -2576,7 +2576,13 @@ class EShopListCategory(APIView):
 
     def get(self, request, campus_id, category_id):
 
-        eshoplist = EShopCategory.objects.filter(category = category_id)
+        if category_id == '99':
+            eshoplist = EShopCategory.objects.all()
+
+        else:
+            eshoplist = EShopCategory.objects.filter(category = category_id)
+
+        
 
         bucketlist = []
         for eshop in eshoplist:
