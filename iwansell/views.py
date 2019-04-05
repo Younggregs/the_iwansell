@@ -1859,7 +1859,7 @@ class NewProductView(APIView):
 
         except:
 
-            error_message = 'yikes! something went'
+            error_message = 'yikes! something went wrong'
             err = {
                 'error_message' : error_message
             }
@@ -2667,6 +2667,25 @@ class HaggleClients(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class NewHagglers(APIView):
 
     def get(self, request, client_id):
@@ -2732,6 +2751,19 @@ class NewHagglers(APIView):
     def post(self, request, client_id):
 
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2909,6 +2941,14 @@ class MessengerView(APIView):
 
 
 
+
+
+
+
+
+
+
+
 class SendMessage(APIView):
 
     def get(self, request, client_id):
@@ -3043,6 +3083,15 @@ class SendMessage(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
 class UnreadMessages(APIView):
 
     def get(self, request):
@@ -3093,6 +3142,24 @@ class UnreadMessages(APIView):
     
     def post(self, request):
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3266,6 +3333,18 @@ class NewEShop(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 class HaveEShop(APIView):
 
     def get(self, request):
@@ -3294,6 +3373,18 @@ class HaveEShop(APIView):
 
     def post(self, request):
         pass
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3531,91 +3622,70 @@ class NewEShopProduct(APIView):
 
        
         category = request.POST.get("category","")
-        subcategory = request.POST.get("subcategory","")
         description = request.POST.get("description","")
         product_name = request.POST.get("product_name","")
-        product_image = request.FILES.get("product_image","")
+        subcategory = request.POST.get("subcategory","")
+        #product_image = request.FILES.get("product_image","")
         starting_price = request.POST.get("starting_price","")
-        media = request.FILES.getlist("media","")
+        #media = request.FILES.getlist("media","")
 
-        try:
+        if True:
             account = Account.objects.get(id=account_id)
             campus_id = account.campus_id
 
             campus = Campus.objects.get(id = campus_id)
-        except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
 
-
-        category = Category.objects.get(id = category)
+            category = Category.objects.get(id = category)
         
 
-        newProduct = Product()
-        newProduct.account = account
-        newProduct.category = category
-        newProduct.campus = campus
-        newProduct.description = description
-        newProduct.product_name = product_name
-        newProduct.product_image = product_image
-        newProduct.starting_price = starting_price
-        newProduct.save()
+            newProduct = Product()
+            newProduct.account = account
+            newProduct.category = category
+            newProduct.campus = campus
+            newProduct.description = description
+            newProduct.product_name = product_name
+            #newProduct.product_image = product_image
+            newProduct.starting_price = starting_price
+            newProduct.save()
 
-       
-
-        for m in media :
-
-                media_register = Media()
-        
-                media_register.image = m
-                media_register.video = m
-
-                file_type = media_register.image.url.split('.')[-1]
-                file_type = file_type.lower()
-
-                if file_type in IMAGE_FILE_TYPES:
-
-                    media_register.video = 0
-
-                else:
-
-                     file_type = media_register.video.url.split('.')[-1]
-                     file_type = file_type.lower()
-
-                     if file_type in VIDEO_FILE_TYPES:
-
-                         media_register.image = 0
-
-                     else:
-
-                         err_msg = 'Unsupported file format, file should be valid image, audio or/and video files'
+            sub_category = SubCategory.objects.get(id = subcategory)
+            eshop_exist = EShop.objects.filter(account_id = account_id).exists
 
 
-                media_register.product = newProduct
-                media_register.save()
+            if eshop_exist:
+                eshop =  EShop.objects.get(account_id = account_id)
+                eshop_id = eshop.id
 
-                sub_category = SubCategory.objects.get(id = subcategory)
-                eshop_exist = EShop.objects.filter(account_id = account_id).exists
+                eshop_product = EShopProduct()
+                eshop_product.eshop = eshop
+                eshop_product.product = newProduct
+                eshop_product.subcategory = sub_category
+                eshop_product.save()
+
+            else:
+                pass
 
 
-                if eshop_exist:
-                    eshop =  EShop.objects.get(account_id = account_id)
-                    eshop_id = eshop.id
 
-                    eshop_product = EShopProduct()
-                    eshop_product.eshop = eshop
-                    eshop_product.product = newProduct
-                    eshop_product.subcategory = sub_category
-                    eshop_product.save()
+            code = newProduct.id
 
-                else:
-                    pass
+            success = {
+                'code' : code
+                }
 
-    
-        id = str(eshop_id)
-            
+            serializer = SuccessCodeSerializer(success, many = False)
 
-        return HttpResponseRedirect('http://127.0.0.1:3000/eshop/' + id )
+            return Response(serializer.data)
 
+        else:
+
+            error_message = 'yikes! something went wrong'
+            err = {
+                'error_message' : error_message
+            }
+            serializer = ErrorCheckSerializer( err, many=False)
+
+            return Response(serializer.data)
 
 
 
@@ -3952,6 +4022,11 @@ class EShopSubCategory(APIView):
 
 
 
+
+
+
+
+
 class EditEShop(APIView):
 
     def get(self, request):
@@ -4023,6 +4098,18 @@ class EditEShop(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 class EShopSearch(APIView):
 
 
@@ -4071,6 +4158,18 @@ class EShopSearch(APIView):
         pass
 
         
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4303,6 +4402,50 @@ class RRView(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class RRViewForm(APIView):
 
     def get(self, request, status_code, id):
@@ -4404,6 +4547,35 @@ class RRViewForm(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class SoldProduct(APIView):
 
     def get(self, request, product_id):
@@ -4433,6 +4605,41 @@ class SoldProduct(APIView):
     
     def post(self, request, eshop_id):
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4475,6 +4682,34 @@ class RemovedProduct(APIView):
     
     def post(self, request, eshop_id):
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4622,6 +4857,33 @@ class FavoriteView(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class FavoriteList(APIView):
 
     def get(self, request, status_code, profile_id):
@@ -4725,6 +4987,47 @@ class FavoriteList(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class GetAccount(APIView):
 
     def get(self,request):
@@ -4745,6 +5048,30 @@ class GetAccount(APIView):
     
     def post(self, request):
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4794,6 +5121,22 @@ class GetCampus(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class ProductName(APIView):
 
     def get(self, request, product_id):
@@ -4827,6 +5170,20 @@ class ProductName(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class PaymentMethodView(APIView):
 
     def get(self, request):
@@ -4840,6 +5197,33 @@ class PaymentMethodView(APIView):
     
     def post(self, request):
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4898,6 +5282,26 @@ class InitiateTransaction(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class ConfirmBuyer(APIView):
 
     def get(self, request):
@@ -4938,6 +5342,28 @@ class ConfirmBuyer(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class ConfirmTransactionSeller(APIView):
 
     def get(self, request):
@@ -4962,6 +5388,26 @@ class ConfirmTransactionSeller(APIView):
 
         
         return Response(False)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5039,6 +5485,31 @@ class Receipt(APIView):
         
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class JoinTransaction(APIView):
 
     def get(self, request):
@@ -5107,6 +5578,29 @@ class JoinTransaction(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class ConfirmTransactionBuyer(APIView):
 
     def get(self, request, transaction_id):
@@ -5131,6 +5625,23 @@ class ConfirmTransactionBuyer(APIView):
         
         return Response(False)
             
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5263,6 +5774,24 @@ class ForgotPasswordView(APIView):
         return Response(serializer.data)
 
     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
