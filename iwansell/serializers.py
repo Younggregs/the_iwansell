@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Account, Category, SubCategory, Campus, Sponsored, Product, EShop, RateReview, Trending, Media, Blog, ForgotPassword
+from .models import Account, Category, SubCategory, Campus, Sponsored, Product, EShop, RateReview, Trending, Media, Blog, PaymentMethod, ForgotPassword
 
 class AccountSerializer(serializers.ModelSerializer):
 
@@ -76,6 +76,16 @@ class SponsoredSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sponsored
         fields = ['product_image']
+
+    
+
+class PaymentMethodSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PaymentMethod
+        fields = '__all__'
+
+
 
 
 class ProductSerializer(serializers.Serializer):
@@ -213,5 +223,46 @@ class ErrorCheckSerializer(serializers.Serializer):
 class SuccessCodeSerializer(serializers.Serializer):
 
     code = serializers.IntegerField()
+
+
+
+
+
+class TransactionSerializer(serializers.Serializer):
+
+    transaction_id = serializers.IntegerField()
+    seller = serializers.CharField()
+    token = serializers.CharField()
+    product_name = serializers.CharField()
+    product_image = serializers.CharField()
+    agreed_price = serializers.CharField()
+    payment_method = serializers.CharField()
+    quantity = serializers.IntegerField()
+
+
+
+class BuyerSerializer(serializers.Serializer):
+
+    transaction_id = serializers.IntegerField()
+    buyer = serializers.CharField()
+
+
+
+
+
+class ReceiptSerializer(serializers.Serializer):
+
+    transaction_id = serializers.IntegerField()
+    seller = serializers.CharField()
+    buyer = serializers.CharField()
+    token = serializers.CharField()
+    product_name = serializers.CharField()
+    product_image = serializers.CharField()
+    price = serializers.CharField()
+    payment_method = serializers.CharField()
+    quantity = serializers.IntegerField()
+    campus_code = serializers.CharField()
+    date = serializers.CharField()
+
 
 

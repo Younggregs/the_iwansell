@@ -15,8 +15,8 @@ from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Account , Category, Media, Product, Campus, Sponsored, EHaggler, Messenger, EShop, SubCategory, EShopProduct, EShopCategory, RateReview, ClientRateReview, EShopRateReview, FavoriteClient, FavoriteProduct, FavoriteEShop, Trending, Blog, ForgotPassword
-from .serializers import AccountSerializer, AddAccountSerializer,SignInSerializer, CategorySerializer, ResultListSerializer,CampusSerializer, TrendSerializer, SponsoredSerializer, ProductSerializer,MessageSerializer, HaggleClientSerializer, EShopSerializer, EShopExistSerializer, SubCategorySerializer, ClientRRSerializer, EShopRRSerializer, ProductImagesSerializer, ProductVideoSerializer, EShopStoreSerializer, ForgotPasswordSerializer, ErrorCheckSerializer, SuccessCodeSerializer, FavoriteListClient, FavoriteListEShop, FavoriteListProduct, ProductSnippetSerializer, AboutEShopSerializer, BlogSerializer, EShopCategorySerializer
+from .models import Account , Category, Media, Product, Campus, Sponsored, EHaggler, Messenger, EShop, SubCategory, EShopProduct, EShopCategory, RateReview, ClientRateReview, EShopRateReview, FavoriteClient, FavoriteProduct, FavoriteEShop, Trending, Blog, ForgotPassword, PaymentMethod, Transaction
+from .serializers import AccountSerializer, AddAccountSerializer,SignInSerializer, CategorySerializer, ResultListSerializer,CampusSerializer, TrendSerializer, SponsoredSerializer, ProductSerializer,MessageSerializer, HaggleClientSerializer, EShopSerializer, EShopExistSerializer, SubCategorySerializer, ClientRRSerializer, EShopRRSerializer, ProductImagesSerializer, ProductVideoSerializer, EShopStoreSerializer, ForgotPasswordSerializer, ErrorCheckSerializer, SuccessCodeSerializer, FavoriteListClient, FavoriteListEShop, FavoriteListProduct, ProductSnippetSerializer, AboutEShopSerializer, BlogSerializer, EShopCategorySerializer, PaymentMethodSerializer, TransactionSerializer, BuyerSerializer, ReceiptSerializer
 import random
 import string
 
@@ -65,6 +65,12 @@ def index(request):
 
 
 def reset_code_generator(size=16, chars=string.ascii_uppercase + string.digits):
+
+    return ''.join(random.choice(chars) for _ in range(size))
+
+
+
+def token_code_generator(size=5, chars=string.ascii_uppercase + string.digits):
 
     return ''.join(random.choice(chars) for _ in range(size))
 
@@ -3650,6 +3656,410 @@ class GetCampus(APIView):
     
     def post(self, request):
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class ProductName(APIView):
+
+    def get(self, request, product_id):
+        
+        try:
+            product = Product.objects.get(id = product_id)
+            product_name = product.product_name
+
+            return Response(product_name)
+
+        
+        except:
+            pass
+        
+        return Response("Invalid product selected!")
+
+
+    def post(self, request, product_id):
+        pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class PaymentMethodView(APIView):
+
+    def get(self, request):
+        
+        payment_method = PaymentMethod.objects.all()
+
+        serializer = PaymentMethodSerializer(payment_method, many=True)
+
+        return Response(serializer.data)
+
+    
+    def post(self, request):
+        pass
+
+
+
+
+
+
+
+
+class InitiateTransaction(APIView):
+
+    def get(self, request):
+        pass
+
+
+    
+    def post(self, request):
+       
+            
+        try:
+            seller = get_account(request)
+
+            product_id = request.POST.get("product_id", "")
+            agreed_price = request.POST.get("agreed_price", "")
+            quantity = request.POST.get("quantity", "")
+            payment_method = request.POST.get("payment_method", "")
+
+            product = Product.objects.get(id = product_id)
+            payment_method = PaymentMethod.objects.get(id = payment_method)
+
+            token = token_code_generator()
+
+            new_transaction = Transaction()
+            new_transaction.seller = seller
+            new_transaction.product = product
+            new_transaction.payment_method = payment_method
+            new_transaction.agreed_price = agreed_price
+            new_transaction.quantity = quantity
+            new_transaction.token = token
+            new_transaction.save()
+
+            return Response(token)
+
+        except:
+            pass
+
+        
+        return Response("Yikes wrong turn, please try again")
+
+
+
+
+
+
+
+
+
+
+
+class ConfirmBuyer(APIView):
+
+    def get(self, request):
+        
+        pass
+
+    
+    def post(self, request):
+        
+        try:
+            account = get_account(request)
+            token = request.POST.get("token","")
+
+            transaction = Transaction.objects.get(seller_id = account.id, token= token )
+            buyer_account = Account.objects.get(id = transaction.buyer)
+
+            buyer = buyer_account.firstname + ' ' + buyer_account.lastname
+            transaction_id = transaction.id
+
+            item = {
+                'buyer' : buyer,
+                'transaction_id': transaction_id
+            }
+
+            serializer = BuyerSerializer(item, many = False)
+
+            return Response(serializer.data)
+
+        except:
+            pass
+
+        
+        return Response(False)
+            
+
+
+
+
+
+
+class ConfirmTransactionSeller(APIView):
+
+    def get(self, request):
+        pass
+
+    
+    def post(self, request):
+        
+        try:
+            account = get_account(request)
+            token = request.POST.get("token","")
+
+            transaction = Transaction.objects.get(seller_id = account.id, token= token )
+            transaction.status = True
+            transaction.save()
+
+
+            return Response(True)
+
+        except:
+            pass
+
+        
+        return Response(False)
+
+
+
+
+
+class Receipt(APIView):
+
+    def get(self, request, transaction_id):
+        
+        try:
+
+            token = request.POST.get("token", "")
+          
+            new_transaction = Transaction.objects.get(id = transaction_id)
+            
+            product = Product.objects.get(id = new_transaction.product_id)
+            payment = PaymentMethod.objects.get(id = new_transaction.payment_method_id)
+            seller_account = Account.objects.get(id = new_transaction.seller_id)
+            buyer_account = Account.objects.get(id = new_transaction.buyer)
+
+            campus = Campus.objects.get(id = seller_account.campus_id)
+            
+
+            transaction_id = new_transaction.id
+            seller = seller_account.firstname + ' ' + seller_account.lastname
+            buyer = buyer_account.firstname + ' ' + buyer_account.lastname
+            token = token
+            product_name = product.product_name
+            product_image = product.product_image
+            price = new_transaction.agreed_price
+            payment_method = payment.payment_method
+            quantity = new_transaction.quantity
+            campus_code = campus.campus_code
+            date = new_transaction.date
+            
+
+
+            bucketlist  = {
+                'transaction_id' : transaction_id,
+                'seller' : seller,
+                'buyer' : buyer,
+                'token' : token,
+                'product_name' : product_name,
+                'product_image' : product_image,
+                'price' : price,
+                'payment_method' : payment_method,
+                'quantity' : quantity,
+                'campus_code' : campus_code,
+                'date' : date
+            }
+
+            serializer = ReceiptSerializer(bucketlist, many=False)
+
+
+            return Response(serializer.data)
+
+        except:
+            pass
+
+
+        
+        error_message = 'Ye! something broke, please try again '
+        err = {
+            'error_message' : error_message
+        }
+        serializer = ErrorCheckSerializer( err, many=False)
+
+        return Response(serializer.data)
+
+    
+    def post(self, request, transaction_id):
+        pass
+        
+
+        
+
+
+class JoinTransaction(APIView):
+
+    def get(self, request):
+        pass
+
+    
+    def post(self, request):
+
+        try:
+            buyer = get_account(request)
+
+            token = request.POST.get("token", "")
+          
+            new_transaction = Transaction.objects.get(token = token)
+
+            product = Product.objects.get(id = new_transaction.product_id)
+            payment = PaymentMethod.objects.get(id = new_transaction.payment_method_id)
+            seller_account = Account.objects.get(id = new_transaction.seller_id)
+
+            transaction_id = new_transaction.id
+            seller = seller_account.firstname + ' ' + seller_account.lastname
+            token = token
+            product_name = product.product_name
+            product_image = product.product_image
+            agreed_price = new_transaction.agreed_price
+            payment_method = payment.payment_method
+            quantity = new_transaction.quantity
+
+            bucketlist  = {
+                'transaction_id' : transaction_id,
+                'seller' : seller,
+                'token' : token,
+                'product_name' : product_name,
+                'product_image' : product_image,
+                'agreed_price' : agreed_price,
+                'payment_method' : payment_method,
+                'quantity' : quantity
+            }
+
+            serializer = TransactionSerializer(bucketlist, many=False)
+
+
+            return Response(serializer.data)
+
+        except:
+            pass
+
+
+        
+        error_message = 'Ye! something broke, please try again '
+        err = {
+            'error_message' : error_message
+        }
+        serializer = ErrorCheckSerializer( err, many=False)
+
+        return Response(serializer.data)
+
+
+
+
+
+
+
+
+
+
+
+
+class ConfirmTransactionBuyer(APIView):
+
+    def get(self, request, transaction_id):
+        pass
+
+    
+    def post(self, request, transaction_id):
+        
+        try:
+            account = get_account(request)
+            token = request.POST.get("token","")
+
+            transaction = Transaction.objects.get(token= token )
+            transaction.buyer = account.id
+            transaction.save()
+
+            return Response(True)
+
+        except:
+            pass
+
+        
+        return Response(False)
+            
+
+
+
+
+
+
+
+
+
+class TransactionStatus(APIView):
+
+    def get(self, request):
+        pass
+
+    
+    def post(self, request):
+        try:
+            account = get_account(request)
+            token = request.POST.get("token","")
+
+            transaction = Transaction.objects.get(seller_id = account.id, token= token )
+            if transaction.status :
+                return Response(True)
+                     
+
+        except:
+            pass
+
+        
+        return Response(False)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

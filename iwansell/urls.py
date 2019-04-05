@@ -95,7 +95,34 @@ urlpatterns = [
     #iwansell/product_list
     url(r'^product_list/$',views.ProductList.as_view(), name = 'product-list'),
 
-    #iwansell/product_list
+    #iwansell/payment_name
+    url(r'^product_name/(?P<product_id>[0-9]+)/$',views.ProductName.as_view(), name = 'product-name'),
+
+    #iwansell/payment_method
+    url(r'^payment_method/$',views.PaymentMethodView.as_view(), name = 'payment_method'),
+
+    #iwansell/initiate_transaction
+    url(r'^initiate_transaction/$',views.InitiateTransaction.as_view(), name = 'initiate_transaction'),
+
+    #iwansell/confirm_buyer
+    url(r'^confirm_buyer/$',views.ConfirmBuyer.as_view(), name = 'confirm_buyer'),
+
+    #iwansell/confirm_transaction_seller
+    url(r'^confirm_transaction_seller/$',views.ConfirmTransactionSeller.as_view(), name = 'confirm-transaction-seller'),
+
+    #iwansell/receipt
+    url(r'^receipt/(?P<transaction_id>[0-9]+)/$',views.Receipt.as_view(), name = 'receipt'),
+
+    #iwansell/join_transaction
+    url(r'^join_transaction/$',views.JoinTransaction.as_view(), name = 'join-transaction'),
+
+    #iwansell/confirm_transaction_buyer
+    url(r'^confirm_transaction_buyer/(?P<transaction_id>[0-9]+)/$',views.ConfirmTransactionBuyer.as_view(), name = 'confirm-transaction-buyer'),
+
+    #iwansell/transaction_status
+    url(r'^transaction_status/$',views.TransactionStatus.as_view(), name = 'transaction-status'),
+
+    #iwansell/eshop_product_list
     url(r'^eshop_product_list/$',views.EShopProductList.as_view(), name = 'eshop-product-list'),
 
     #iwansell/product_images
