@@ -255,6 +255,29 @@ class Blog(models.Model):
 
 
 
+class PaymentMethod(models.Model):
+    payment_method = models.CharField(max_length = 30)
+
+
+class Transaction(models.Model):
+    seller = models.ForeignKey(Account, on_delete=models.CASCADE)
+    buyer = models.IntegerField(default = 0)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    payment_method = models.ForeignKey(PaymentMethod, on_delete=models.CASCADE)
+    agreed_price = models.CharField(max_length= 10)
+    quantity = models.IntegerField()
+    token = models.CharField(max_length = 7)
+    status = models.BooleanField(default = False)
+    date = models.DateTimeField(default = timezone.now)
+
+
+    def __str__(self):
+        return 'transaction'
+
+    class Meta:
+        ordering = ['date']
+
+    
 
 
 
