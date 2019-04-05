@@ -27,8 +27,35 @@ import string
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 IMAGE_FILE_TYPES = ['png', 'jpg', 'jpeg']
 VIDEO_FILE_TYPES = ['webm', 'mp4', 'ogg']
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -70,9 +97,31 @@ def reset_code_generator(size=16, chars=string.ascii_uppercase + string.digits):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 def token_code_generator(size=5, chars=string.ascii_uppercase + string.digits):
 
     return ''.join(random.choice(chars) for _ in range(size))
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -97,6 +146,17 @@ def get_account(request):
     else:
         
         return False
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -259,6 +319,16 @@ class AddAccount(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
 class SignIn(APIView):
 
     def get(self,request):
@@ -332,6 +402,19 @@ class SignIn(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 class AccountDetail(APIView):
 
     def get(self,request,account_id):
@@ -369,6 +452,9 @@ class AccountDetail(APIView):
 
         account.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
 
 
 
@@ -631,6 +717,16 @@ class UpdatePassword(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
 class IsLoggedIn(APIView):
 
     def get(self, request):
@@ -655,6 +751,22 @@ class IsLoggedIn(APIView):
         pass
 
     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -703,6 +815,28 @@ class UpdateDP(APIView):
             serializer = ErrorCheckSerializer( err, many=False)
 
             return Response(serializer.data)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -777,6 +911,28 @@ class UpdatePassword(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class IsMyProfile(APIView):
 
     def get(self, request, profile_id):
@@ -799,6 +955,21 @@ class IsMyProfile(APIView):
 
     def post(self, request, profile_id):
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -860,25 +1031,34 @@ class MyAccountID(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
 class IsMyEShop(APIView):
 
     def get(self, request, eshop_id):
 
         my_eshop = False
 
-        try:
+        if True :
             account = get_account(request)
             eshop = EShop.objects.get(id = eshop_id)
 
             if account:
-                 if int(account.id) == eshop.account_id :
+                if int(account.id) == eshop.account_id :
                     my_eshop = True
             
             else:
                 my_eshop = 0
 
 
-        except:
+        else:
             pass
         
 
@@ -959,6 +1139,28 @@ class MyEShopID(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class CategoryView(APIView):
 
     def get(self,request):
@@ -971,6 +1173,29 @@ class CategoryView(APIView):
     def post(self,request):
 
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1015,6 +1240,22 @@ class RecentBlogPost(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class BlogPost(APIView):
 
     def get(self, request, blog_id):
@@ -1032,6 +1273,28 @@ class BlogPost(APIView):
 
     def post(self, request, blog_id):
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     
 
@@ -1059,6 +1322,27 @@ class BlogTop(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class CategoryBlog(APIView):
 
     def get(self, request, category_id):
@@ -1076,6 +1360,34 @@ class CategoryBlog(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class BlogSnippet(APIView):
 
     def get(self, request):
@@ -1088,6 +1400,28 @@ class BlogSnippet(APIView):
 
     def post(self, request, blog_id):
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1120,6 +1454,29 @@ class SubCategoryView(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class SubCategoryMain(APIView):
 
     def get(self,request):
@@ -1132,6 +1489,33 @@ class SubCategoryMain(APIView):
     def post(self,request, category_id):
 
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1162,6 +1546,29 @@ class SubCategoryProduct(APIView):
     def post(self,request, category_id):
 
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1209,6 +1616,25 @@ class SubCategoryIcon(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class CampusView(APIView):
 
     def get(self,request):
@@ -1221,6 +1647,32 @@ class CampusView(APIView):
     def post(self,request):
 
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1245,6 +1697,35 @@ class CampusSearch(APIView):
         serializer = CampusSerializer(campus, many=True)
 
         return Response(serializer.data)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1302,6 +1783,35 @@ class CategoryProduct(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class NewProductView(APIView):
 
     def get(self,request, account_id):
@@ -1314,69 +1824,199 @@ class NewProductView(APIView):
         category = request.POST.get("category","")
         description = request.POST.get("description","")
         product_name = request.POST.get("product_name","")
-        product_image = request.FILES.get("product_image","")
+        #product_image = request.FILES.get("product_image","")
         starting_price = request.POST.get("starting_price","")
-        media = request.FILES.getlist("media","")
+        #media = request.FILES.getlist("media","")
 
         try:
             account = Account.objects.get(id=account_id)
             campus_id = account.campus_id
 
             campus = Campus.objects.get(id = campus_id)
+
+            category = Category.objects.get(id = category)
+        
+
+            newProduct = Product()
+            newProduct.account = account
+            newProduct.category = category
+            newProduct.campus = campus
+            newProduct.description = description
+            newProduct.product_name = product_name
+            #newProduct.product_image = product_image
+            newProduct.starting_price = starting_price
+            newProduct.save()
+
+            code = newProduct.id
+
+            success = {
+                'code' : code
+                }
+
+            serializer = SuccessCodeSerializer(success, many = False)
+
+            return Response(serializer.data)
+
         except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+
+            error_message = 'yikes! something went'
+            err = {
+                'error_message' : error_message
+            }
+            serializer = ErrorCheckSerializer( err, many=False)
+
+            return Response(serializer.data)
 
 
-        category = Category.objects.get(id = category)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class MediaUpload(APIView):
+
+    def get(self, request, product_id):
+        pass
+
+    
+    def post(self, request, product_id):
         
 
-        newProduct = Product()
-        newProduct.account = account
-        newProduct.category = category
-        newProduct.campus = campus
-        newProduct.description = description
-        newProduct.product_name = product_name
-        newProduct.product_image = product_image
-        newProduct.starting_price = starting_price
-        newProduct.save()
+        media = request.FILES.getlist("files","")
 
-       
+        if True:
+            product = Product.objects.get(id = product_id)
 
-        for m in media :
 
-                media_register = Media()
-        
-                media_register.image = m
-                media_register.video = m
+            i = 0
+            for m in media :
 
-                file_type = media_register.image.url.split('.')[-1]
-                file_type = file_type.lower()
+                if i == 0:
+                    product.product_image = m
+                    product.save()
 
-                if file_type in IMAGE_FILE_TYPES:
-
-                    media_register.video = 0
+                    i = i + 1
+               
 
                 else:
+                    media_register = Media()
+        
+                    media_register.image = m
+                    media_register.video = m
 
-                     file_type = media_register.video.url.split('.')[-1]
-                     file_type = file_type.lower()
+                    file_type = media_register.image.url.split('.')[-1]
+                    file_type = file_type.lower()
 
-                     if file_type in VIDEO_FILE_TYPES:
+                    if file_type in IMAGE_FILE_TYPES:
 
-                         media_register.image = 0
+                        media_register.video = 0
 
-                     else:
+                    else:
 
-                         err_msg = 'Unsupported file format, file should be valid image, audio or/and video files'
+                        file_type = media_register.video.url.split('.')[-1]
+                        file_type = file_type.lower()
 
+                        if file_type in VIDEO_FILE_TYPES:
 
-                media_register.product = newProduct
-                media_register.save()
+                            media_register.image = 0
+
+                        else:
+
+                            err_msg = 'Unsupported file format, file should be valid image, audio or/and video files'
+                    
+
+                    media_register.product = product
+                    media_register.save()
+
+                    i = i + 1
             
-        id = str(newProduct.id)
 
-        return HttpResponseRedirect('http://127.0.0.1:3000/product/' + id)
-       
+
+
+            code = product.id
+
+            success = {
+                'code' : code
+                }
+
+            serializer = SuccessCodeSerializer(success, many = False)
+
+            return Response(serializer.data)
+
+        else:
+
+            error_message = 'yikes! something went wrong, please try again'
+            err = {
+                'error_message' : error_message
+            }
+            serializer = ErrorCheckSerializer( err, many=False)
+
+            return Response(serializer.data)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
 
 
 
@@ -1391,40 +2031,67 @@ class ProductList(APIView):
 
     def get(self, request):
         
-        email = 'dretzam@gmail.com'
+        
+
+        try: 
+            account = get_account(request)
+            account_id = account.id
+
+            product = Product.objects.filter(account_id = account_id)
+
+            register = []
+
+            for buffer in product :
+
+                product_id = buffer.id
+                product_name = buffer.product_name
+                product_image = buffer.product_image
+                starting_price = buffer.starting_price
+
+                context_list = {
+                    'product_id': product_id,
+                    'product_name': product_name,
+                    'product_image' : product_image,
+                    'starting_price' : starting_price,
+                }   
+
+                register.append(context_list)
+
+            serializer = ResultListSerializer(register, many=True)
+
+            return Response(serializer.data)
+
+        except:
+            pass
 
 
-        account = Account.objects.get(email = email)
-        account_id = account.id
-
-        product = Product.objects.filter(account_id = account_id)
-
-        register = []
-
-        for buffer in product :
-
-            product_id = buffer.id
-            product_name = buffer.product_name
-            product_image = buffer.product_image
-            starting_price = buffer.starting_price
-
-            context_list = {
-                'product_id': product_id,
-                'product_name': product_name,
-                'product_image' : product_image,
-                'starting_price' : starting_price,
-            }
-
-            register.append(context_list)
-
-        serializer = ResultListSerializer(register, many=True)
-
-        return Response(serializer.data)
+        return Response(False)
 
 
     
     def post(self, request):
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1513,6 +2180,21 @@ class EShopProductList(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class Search(APIView):
 
     def get(self, request,campus_id, category_id):
@@ -1568,6 +2250,24 @@ class Search(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class TrendingView(APIView):
 
     def get(self, request, campus_id, trending_url):
@@ -1603,6 +2303,28 @@ class TrendingView(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class SponsoredView(APIView):
 
     def get(self, request, campus_id):
@@ -1614,6 +2336,30 @@ class SponsoredView(APIView):
 
     def post(self, request, campus_id):
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1687,6 +2433,41 @@ class ProductView(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class ProductImages(APIView):
 
     def get(self, request, product_id ):
@@ -1699,6 +2480,30 @@ class ProductImages(APIView):
 
     def post(self, request, product_id ):
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1729,6 +2534,31 @@ class ProductVideo(APIView):
 
     def post(self, request, product_id):
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1816,6 +2646,27 @@ class HaggleClients(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class NewHagglers(APIView):
 
     def get(self, request, client_id):
@@ -1881,6 +2732,32 @@ class NewHagglers(APIView):
     def post(self, request, client_id):
 
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2012,6 +2889,26 @@ class MessengerView(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class SendMessage(APIView):
 
     def get(self, request, client_id):
@@ -2119,6 +3016,33 @@ class SendMessage(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class UnreadMessages(APIView):
 
     def get(self, request):
@@ -2169,6 +3093,26 @@ class UnreadMessages(APIView):
     
     def post(self, request):
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2299,6 +3243,29 @@ class NewEShop(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class HaveEShop(APIView):
 
     def get(self, request):
@@ -2342,6 +3309,29 @@ class HaveEShop(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class EShopView(APIView):
 
     def get(self, request, eshop_id):
@@ -2364,6 +3354,27 @@ class EShopView(APIView):
     
     def post(self, request):
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2432,26 +3443,46 @@ class AboutEShop(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class EShopExist(APIView):
 
     def get(self, request):
 
-        if request.user.is_authenticated:
-            user = User.objects.get(username = request.user)
-            email = user.username
+        try:
+            account = get_account(request)
+            account_id = account.id
+
+            eshop_exist = EShop.objects.filter(account_id = account_id).exists
+
+            json_object = {
+                'eshop_exist' : eshop_exist
+            }
+
+            serializer = EShopExistSerializer( json_object, many = False)
+            
+            return Response( serializer.data )
+
+        except:
+            pass
 
 
-        account = Account.objects.get(email = email)
-        account_id = account.id
-
-        eshop_exist = EShop.objects.filter(account_id = account_id).exists
-
-        json_object = {
-            'eshop_exist' : eshop_exist
-        }
-
-        serializer = EShopExistSerializer( json_object, many = False)
-        return Response( serializer.data )
+        return Response( False)
 
 
     def post(get, request):
@@ -2459,6 +3490,22 @@ class EShopExist(APIView):
 
 
     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2587,6 +3634,24 @@ class NewEShopProduct(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class EShopCategoryView(APIView):
 
     def get(self, request, eshop_id):
@@ -2612,6 +3677,19 @@ class EShopCategoryView(APIView):
 
     def post(self, request, campus_id, subcategory_id):
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2671,6 +3749,29 @@ class EShopListCategory(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class EShopList(APIView):
 
     def get(self, request, campus_id):
@@ -2692,6 +3793,18 @@ class EShopList(APIView):
         serializer = EShopSerializer(eshoplist, many = True)
 
         return Response(serializer.data)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2754,6 +3867,15 @@ class EShopStore(APIView):
 
     def post(self, request, eshop_id, subcategory_id):
         pass
+
+
+
+
+
+
+
+
+
 
 
 

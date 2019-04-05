@@ -92,6 +92,9 @@ urlpatterns = [
     #iwansell/newproduct
     url(r'^newproduct/(?P<account_id>[0-9]+)/$',views.NewProductView.as_view(), name = 'new-product'),
 
+    #iwansell/media_upload
+    url(r'^media_upload/(?P<product_id>[0-9]+)/$',views.MediaUpload.as_view(), name = 'media-upload'),
+
     #iwansell/product_list
     url(r'^product_list/$',views.ProductList.as_view(), name = 'product-list'),
 
