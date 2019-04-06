@@ -2575,55 +2575,54 @@ class HaggleClients(APIView):
 
     def get(self, request):
         
-        if request.user.is_authenticated:
-            user = User.objects.get(username = request.user)
-            email = user.username
+        try:
+            account = get_account(request)
+            account_id = account.id
+
+            chats = EHaggler.objects.filter(account_1 = account_id) | EHaggler.objects.filter(account_2 = account_id)
+
+            client_register = []
+            if chats !=  0 :
+
+                for client in chats:
+
+                    client_buffer = []
+
+                    if client.account_1_id == account_id :
+
+                        account = Account.objects.get(id = client.account_2)
+                        name = account.firstname + ' ' + account.lastname
+                        client_id = account.id
+                        haggle_id = client.id
+
+                        client_buffer = {
+                            'name' : name,
+                            'client_id' : client_id,
+                            'haggle_id' : haggle_id
+                        }
+
+                        client_register.append(client_buffer)
+
+                    else:
+
+                        account = Account.objects.get(id = client.account_1_id)
+                        name = account.firstname + ' ' + account.lastname
+                        client_id = account.id
+                        haggle_id = client.id
+
+                        client_buffer = {
+                            'name' : name,
+                            'client_id' : client_id,
+                            'haggle_id' : haggle_id
+                        }
+
+                        client_register.append(client_buffer)
 
 
-        account = Account.objects.get(email = email)
-        account_id = account.id
-
-        chats = EHaggler.objects.filter(account_1 = account_id) | EHaggler.objects.filter(account_2 = account_id)
-
-        client_register = []
-        if chats !=  0 :
-
-            for client in chats:
-
-                client_buffer = []
-
-                if client.account_1_id == account_id :
-
-                    account = Account.objects.get(id = client.account_2)
-                    name = account.firstname + ' ' + account.lastname
-                    client_id = account.id
-                    haggle_id = client.id
-
-                    client_buffer = {
-                        'name' : name,
-                        'client_id' : client_id,
-                        'haggle_id' : haggle_id
-                    }
-
-                    client_register.append(client_buffer)
-
-                else:
-
-                    account = Account.objects.get(id = client.account_1_id)
-                    name = account.firstname + ' ' + account.lastname
-                    client_id = account.id
-                    haggle_id = client.id
-
-                    client_buffer = {
-                        'name' : name,
-                        'client_id' : client_id,
-                        'haggle_id' : haggle_id
-                    }
-
-                    client_register.append(client_buffer)
-
-
-        else :
+            else :
+                pass
+        
+        except:
             pass
 
 
@@ -2690,19 +2689,14 @@ class NewHagglers(APIView):
 
     def get(self, request, client_id):
 
-        if request.user.is_authenticated:
-            user = User.objects.get(username = request.user)
-            email = user.username
+        if True:
 
-
-        try:
-
-            account = Account.objects.get( email = email ) 
+            account = get_account(request)
             account_id = account.id
 
             account_2 = Account.objects.get( id = client_id)
 
-        except:
+        else:
 
             error_message = 'Wrong turn'
 
@@ -2715,7 +2709,7 @@ class NewHagglers(APIView):
             return Response(serializer.data)
 
 
-        try :
+        if True:
 
             chat_exist = EHaggler.objects.get(account_1_id = client_id, account_2 = account_id)
             chat_exist = EHaggler.objects.get(account_1_id = account_id, account_2 = client_id)
@@ -2730,7 +2724,7 @@ class NewHagglers(APIView):
 
             return Response(serializer.data)
 
-        except : 
+        else : 
 
             ehaggler = EHaggler()
             ehaggler.account_1 = account
@@ -2806,78 +2800,72 @@ class MessengerView(APIView):
 
     def get(self, request, client_id):
         
-        if request.user.is_authenticated:
-            user = User.objects.get(username = request.user)
-            email = user.username
-
-        else :
-            email = 'jcole@gmail.com'
-
         
-        account = Account.objects.get(email = email)
-        account_id = account.id
-
-        evaluator = 0
         try:
+            account = get_account(request)
+            account_id = account.id
 
-            chat_exist = EHaggler.objects.get(account_1 = client_id, account_2 = account_id)
-            evaluator = 1
+            evaluator = 0
+            try:
 
-        except:
-            pass
+                chat_exist = EHaggler.objects.get(account_1 = client_id, account_2 = account_id)
+                evaluator = 1
 
-        try:
+            except:
+                pass
+
+            try:
             
-            chat_exist = EHaggler.objects.get(account_1 = account_id, account_2 = client_id)
-            evaluator = 1
+                chat_exist = EHaggler.objects.get(account_1 = account_id, account_2 = client_id)
+                evaluator = 1
 
-        except:
-            pass
+            except:
+                pass
         
 
-        haggle_register = [] 
+            haggle_register = [] 
 
-        if evaluator == 1:
+            if evaluator == 1:
             
-            try :
-                ehaggler = EHaggler.objects.get(account_1 = client_id, account_2 = account_id)
-                ehaggler_id = ehaggler.id
+                try :
+                    ehaggler = EHaggler.objects.get(account_1 = client_id, account_2 = account_id)
+                    ehaggler_id = ehaggler.id
             
-            except :
+                except :
 
-                ehaggler = EHaggler.objects.get(account_1 = account_id, account_2 = client_id)
-                ehaggler_id = ehaggler.id
+                    ehaggler = EHaggler.objects.get(account_1 = account_id, account_2 = client_id)
+                    ehaggler_id = ehaggler.id
 
 
-            messages = Messenger.objects.filter(ehaggler_id = ehaggler_id)
+                messages = Messenger.objects.filter(ehaggler_id = ehaggler_id)
 
-            for message in messages:
+                for message in messages:
 
-                from_or_to = True
-
-                if int(message.messenger_id) == int(client_id):
-
-                    msg = message.message
                     from_or_to = True
 
-                    haggle_buffer = {
-                        'msg' : msg,
-                        'from_or_to' : from_or_to,
-                    }
+                    if int(message.messenger_id) == int(client_id):
 
-                    haggle_register.append(haggle_buffer)
+                        msg = message.message
+                        from_or_to = True
 
-                else :
+                        haggle_buffer = {
+                            'msg' : msg,
+                            'from_or_to' : from_or_to,
+                        }
 
-                    msg = message.message
-                    from_or_to = False
+                        haggle_register.append(haggle_buffer)
 
-                    haggle_buffer = {
-                        'msg' : msg,
-                        'from_or_to' : from_or_to,
-                    }
+                    else :
 
-                    haggle_register.append(haggle_buffer)
+                        msg = message.message
+                        from_or_to = False
+
+                        haggle_buffer = {
+                            'msg' : msg,
+                            'from_or_to' : from_or_to,
+                        }
+
+                        haggle_register.append(haggle_buffer)
 
                  
 
@@ -2887,7 +2875,7 @@ class MessengerView(APIView):
         
 
 
-        else :
+        except :
 
            error_message = 'Oops something went wrong, mmhmm'
            err = {
@@ -2956,88 +2944,87 @@ class SendMessage(APIView):
 
     def post(self, request, client_id):
         
-        if request.user.is_authenticated:
-            user = User.objects.get(username = request.user)
-            email = user.username
+        try:
+            account = get_account(request)
+            account_id = account.id
 
-        
-        account = Account.objects.get(email = email)
-        account_id = account.id
+            status = 0
 
-        status = 0
+            try :
 
-        try :
+                ehaggler = EHaggler.objects.get(account_2 = client_id, account_1_id = account_id)
 
-            ehaggler = EHaggler.objects.get(account_2 = client_id, account_1_id = account_id)
-
-            status = 1 
-
-        except:
-            pass
-
-        
-        if status == 0:
-            try: 
-
-                ehaggler = EHaggler.objects.get(account_2 = account_id, account_1_id = client_id)
-                status = 1
+                status = 1 
 
             except:
                 pass
 
+        
+            if status == 0:
+                try: 
+
+                    ehaggler = EHaggler.objects.get(account_2 = account_id, account_1_id = client_id)
+                    status = 1
+
+                except:
+                    pass
 
 
-        msg = request.POST.get("message","")
+
+            msg = request.POST.get("message","")
 
        
-        if msg:
-            pass
-
-        else:
-            msg="Angel"
-
-        messenger = Messenger()
-        messenger.ehaggler = ehaggler
-        messenger.message = msg
-        messenger.messenger = account
-        messenger.save()
-
-
-        messages = Messenger.objects.filter(ehaggler_id = ehaggler.id)
-        haggle_register = []
- 
-
-        if True :
-            for message in messages:
-
-                from_or_to = True
-
-                if message.messenger == client_id :
-
-                    msg = message.message
-                    from_or_to = True
-
-                    haggle_buffer = {
-                        'msg' : msg,
-                        'from_or_to' : from_or_to,
-                    }
-
-                    haggle_register.append(haggle_buffer)
-
-                else :
-
-                    msg = message.message
-                    from_or_to = False
-
-                    haggle_buffer = {
-                        'msg' : msg,
-                        'from_or_to' : from_or_to,
-                    }
-
-                    haggle_register.append(haggle_buffer)
+            if msg:
+                pass
 
             else:
-                pass
+                msg="Angel"
+
+            messenger = Messenger()
+            messenger.ehaggler = ehaggler
+            messenger.message = msg
+            messenger.messenger = account
+            messenger.save()
+
+
+            messages = Messenger.objects.filter(ehaggler_id = ehaggler.id)
+            haggle_register = []
+ 
+
+            if True :
+                for message in messages:
+
+                    from_or_to = True
+
+                    if message.messenger == client_id :
+
+                        msg = message.message
+                        from_or_to = True
+
+                        haggle_buffer = {
+                            'msg' : msg,
+                            'from_or_to' : from_or_to,
+                        }
+
+                        haggle_register.append(haggle_buffer)
+
+                    else :
+
+                        msg = message.message
+                        from_or_to = False
+
+                        haggle_buffer = {
+                            'msg' : msg,
+                            'from_or_to' : from_or_to,
+                        }
+
+                        haggle_register.append(haggle_buffer)
+
+                else:
+                    pass
+
+        except:
+            pass
         
         serializer = MessageSerializer(haggle_register, many=True)
 
