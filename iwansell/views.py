@@ -2689,14 +2689,14 @@ class NewHagglers(APIView):
 
     def get(self, request, client_id):
 
-        if True:
+        try:
 
             account = get_account(request)
             account_id = account.id
 
             account_2 = Account.objects.get( id = client_id)
 
-        else:
+        except:
 
             error_message = 'Wrong turn'
 
@@ -2709,7 +2709,7 @@ class NewHagglers(APIView):
             return Response(serializer.data)
 
 
-        if True:
+        try:
 
             chat_exist = EHaggler.objects.get(account_1_id = client_id, account_2 = account_id)
             chat_exist = EHaggler.objects.get(account_1_id = account_id, account_2 = client_id)
@@ -2724,7 +2724,7 @@ class NewHagglers(APIView):
 
             return Response(serializer.data)
 
-        else : 
+        except : 
 
             ehaggler = EHaggler()
             ehaggler.account_1 = account
@@ -2944,6 +2944,8 @@ class SendMessage(APIView):
 
     def post(self, request, client_id):
         
+        haggle_register = []
+
         try:
             account = get_account(request)
             account_id = account.id
@@ -2988,7 +2990,7 @@ class SendMessage(APIView):
 
 
             messages = Messenger.objects.filter(ehaggler_id = ehaggler.id)
-            haggle_register = []
+            
  
 
             if True :
@@ -4021,26 +4023,21 @@ class EditEShop(APIView):
 
     def post(self, request):
 
-        if request.user.is_authenticated:
-            user = User.objects.get(username = request.user)
-            email = user.username
-
-
         try:
-            account = Account.objects.get(email = email)
+            account = get_account(request)
             account_id = account.id
-        except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
 
-        try:
             eshop = EShop.objects.get(account_id = account_id)
 
             catch_board  = request.FILES.get("catch_board","")
+            about = request.POST.get("about","")
 
             eshop.catch_board = catch_board
+            if about :
+                eshop.about = about
             eshop.save()
 
-            code = 11
+            code = eshop.id
 
             success = {
                 'code' : code
@@ -4274,12 +4271,20 @@ class RRView(APIView):
     
     def post(self, request, status_code, id):
 
-        if request.user.is_authenticated:
-            user = User.objects.get(username = request.user)
-            email = user.username
+        try:
+            account = get_account(request)
 
+        except:
 
-        account = Account.objects.get(email=email)
+            error_message = "invalid account"
+
+            err = {
+                'error_message' : error_message
+            }
+
+            serializer = ErrorCheckSerializer(err, many = False)
+            return Response(serializer.data)
+
 
         if status_code == '0' :
 
@@ -5717,7 +5722,7 @@ class ForgotPasswordView(APIView):
             new_reset.email = email
             new_reset.save()
 
-            message = 'Hey dear! You are nearly done with your password reset process, Follow this link to reset your password http://127.0.0.1:3000/reset_password/' +  str(reset_code) + ' You have done well'
+            message = 'Hey dear! You are nearly done with your password reset process, Follow this link to reset your password https://iwansell.com/reset_password/' +  str(reset_code) + ' You have done well'
             email = EmailMessage('Your password reset details from Iwansell', message, to=[email])
             email.send()
 
