@@ -145,7 +145,7 @@ def get_account(request):
 
     else:
         
-        return False
+        return -1
 
 
 
@@ -1046,19 +1046,17 @@ class IsMyEShop(APIView):
 
         my_eshop = False
 
-        if True :
+        try:
             account = get_account(request)
             eshop = EShop.objects.get(id = eshop_id)
 
             if account:
                 if int(account.id) == eshop.account_id :
                     my_eshop = True
-            
-            else:
-                my_eshop = 0
+                
 
 
-        else:
+        except:
             pass
         
 
@@ -4449,14 +4447,11 @@ class RRViewForm(APIView):
 
         if status_code == '0' :
 
-            if request.user.is_authenticated:
-                user = User.objects.get(username = request.user)
-                email = user.username
+            try: 
+                account = get_account(request)
 
-            try:
-                account = Account.objects.get(email=email)
             except:
-                return Response(status=status.HTTP_404_NOT_FOUND)
+                pass
 
             ratereview = RateReview()
 
@@ -4480,7 +4475,7 @@ class RRViewForm(APIView):
             clientrr.save()
                 
 
-            return HttpResponseRedirect('http://localhost:3000/profile/' + id)
+            return HttpResponseRedirect('https:/iwansell.com/profile/' + id)
 
 
 
@@ -4515,7 +4510,7 @@ class RRViewForm(APIView):
             eshoprr.eshop = client_eshop
             eshoprr.save()
 
-            return HttpResponseRedirect('http://localhost:3000/eshop/' + id)
+            return HttpResponseRedirect('https://iwansell.com/eshop/' + id)
 
 
         else:
@@ -4728,17 +4723,12 @@ class FavoriteView(APIView):
         favorited = False
 
         if status_code == '0':
-            
-            if request.user.is_authenticated:
-                user = User.objects.get(username = request.user)
-                email = user.username
         
 
-
             try:
-                account = Account.objects.get(email=email)
+                account = get_account(request)
             except:
-                return Response(status=status.HTTP_404_NOT_FOUND)
+                pass
 
             try:
                 fav_client = FavoriteClient.objects.get(client = id)
@@ -4762,17 +4752,12 @@ class FavoriteView(APIView):
         elif status_code == '1':
             
             
-            if request.user.is_authenticated:
-                user = User.objects.get(username = request.user)
-                email = user.username
-        
-
 
             try:
-                account = Account.objects.get(email=email)
+                account = get_account(request)
                 product = Product.objects.get(id = id)
             except:
-                return Response(status=status.HTTP_404_NOT_FOUND)
+                pass
             
             try:
 
@@ -4796,17 +4781,12 @@ class FavoriteView(APIView):
 
         elif status_code == '2':
             
-            if request.user.is_authenticated:
-                user = User.objects.get(username = request.user)
-                email = user.username
-        
-
-
+            
             try:
-                account = Account.objects.get(email=email)
+                account = get_account(request)
                 eshop = EShop.objects.get(id=id)
             except:
-                return Response(status=status.HTTP_404_NOT_FOUND)
+                pass
 
             try:
 
@@ -5024,17 +5004,13 @@ class GetAccount(APIView):
 
     def get(self,request):
         
-        if request.user.is_authenticated:
-            user = User.objects.get(username = request.user)
-            email = user.username
-        
-
         
         try:
-            account = Account.objects.get(email=email)
+            account = get_account(request)
             account_id = account.id
         except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            
+            account_id = False
 
         return Response(account_id)
     
@@ -5082,15 +5058,11 @@ class GetCampus(APIView):
 
     def get(self,request):
         
-        if request.user.is_authenticated:
-            user = User.objects.get(username = request.user)
-            email = user.username
-        
         try:
-            account = Account.objects.get(email=email)
+            account = get_account(request)
             campus_id = account.campus_id
         except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            campus_id = 1
 
 
         return Response(campus_id)
