@@ -17,13 +17,23 @@ class Account(models.Model):
     password = models.CharField(max_length = 150)
     firstname = models.CharField(max_length = 30)
     lastname = models.CharField(max_length = 30)
-    phone = models.CharField(max_length=11)
+    phone = models.CharField(max_length=14)
     display_pic = models.FileField(default='anon.png')
     campus = models.ForeignKey(Campus, default=1, on_delete=models.CASCADE)
     date = models.DateTimeField(default = timezone.now)
 
     def __str__(self):
-        return self.phone
+        return self.firstname + ' ' + self.lastname
+
+
+
+class AlternatePhone(models.Model):
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    phone1 = models.CharField(max_length=14)
+    phone2 = models.CharField(max_length=14)
+
+    def __str__(self):
+        return self.phone1 + ' ' + self.phone2
 
 
 class Category(models.Model):
@@ -64,7 +74,7 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     campus = models.ForeignKey(Campus, default=1, on_delete=models.CASCADE)
     description = models.TextField()
-    product_name = models.CharField(max_length=100)
+    product_name = models.CharField(max_length=150)
     product_image = models.FileField(default='product.png')
     starting_price = models.CharField(max_length=100)
     sold = models.BooleanField(default = False)
@@ -277,7 +287,69 @@ class Transaction(models.Model):
     class Meta:
         ordering = ['date']
 
-    
+
+
+
+
+
+class Sold(models.Model):
+    product_name = models.CharField(max_length= 150)
+    frequency = models.IntegerField(default = 1)
+    date = models.DateTimeField(default = timezone.now)
+
+    def __str__(self):
+        return product_name + ': ' + frequency
+
+    class Meta:
+        ordering = ['-frequency']
+
+
+
+
+class NotFound(models.Model):
+    product_name = models.CharField(max_length= 150)
+    frequency = models.IntegerField(default = 1)
+    date = models.DateTimeField(default = timezone.now)
+
+    def __str__(self):
+        return product_name + ': ' + frequency
+
+    class Meta:
+        ordering = ['-frequency']
+
+
+
+
+
+class TopSearched(models.Model):
+    product_name = models.CharField(max_length= 150)
+    frequency = models.IntegerField(default = 1)
+    date = models.DateTimeField(default = timezone.now)
+
+    def __str__(self):
+        return product_name + ': ' + frequency
+
+    class Meta:
+        ordering = ['-frequency']
+
+
+
+class TopForSell(models.Model):
+    product_name = models.CharField(max_length= 150)
+    frequency = models.IntegerField(default = 1)
+    date = models.DateTimeField(default = timezone.now)
+
+    def __str__(self):
+        return product_name + ': ' + frequency
+
+    class Meta:
+        ordering = ['-frequency']
+
+
+
+
+
+
 
 
 

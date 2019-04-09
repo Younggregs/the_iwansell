@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Account, Category, SubCategory, Campus, Sponsored, Product, EShop, RateReview, Trending, Media, Blog, PaymentMethod, ForgotPassword
+from .models import Account, AlternatePhone, Category, SubCategory, Campus, Sponsored, Product, EShop, RateReview, Trending, Media, Blog, PaymentMethod, ForgotPassword
 
 class AccountSerializer(serializers.ModelSerializer):
 
@@ -13,6 +13,13 @@ class AddAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
         fields = ['firstname','lastname','phone','campus','password']
+
+
+class AlternatePhoneSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = AlternatePhone
+        fields = '__all__'
 
 
 class SignInSerializer(serializers.Serializer):
@@ -263,6 +270,24 @@ class ReceiptSerializer(serializers.Serializer):
     quantity = serializers.IntegerField()
     campus_code = serializers.CharField()
     date = serializers.CharField()
+
+
+class BusinessSerializer(serializers.Serializer):
+
+    id = serializers.IntegerField()
+    product_name = serializers.CharField()
+    frequency = serializers.IntegerField()
+
+
+
+class ProductValuationSerializer(serializers.Serializer):
+
+    searched_frequency = serializers.IntegerField()
+    notFound_frequency = serializers.IntegerField()
+    forSell_frequency = serializers.IntegerField()
+    sold_frequency = serializers.IntegerField()
+
+
 
 
 

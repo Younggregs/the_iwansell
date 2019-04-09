@@ -15,8 +15,8 @@ from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Account , Category, Media, Product, Campus, Sponsored, EHaggler, Messenger, EShop, SubCategory, EShopProduct, EShopCategory, RateReview, ClientRateReview, EShopRateReview, FavoriteClient, FavoriteProduct, FavoriteEShop, Trending, Blog, ForgotPassword, PaymentMethod, Transaction
-from .serializers import AccountSerializer, AddAccountSerializer,SignInSerializer, CategorySerializer, ResultListSerializer,CampusSerializer, TrendSerializer, SponsoredSerializer, ProductSerializer,MessageSerializer, HaggleClientSerializer, EShopSerializer, EShopExistSerializer, SubCategorySerializer, ClientRRSerializer, EShopRRSerializer, ProductImagesSerializer, ProductVideoSerializer, EShopStoreSerializer, ForgotPasswordSerializer, ErrorCheckSerializer, SuccessCodeSerializer, FavoriteListClient, FavoriteListEShop, FavoriteListProduct, ProductSnippetSerializer, AboutEShopSerializer, BlogSerializer, EShopCategorySerializer, PaymentMethodSerializer, TransactionSerializer, BuyerSerializer, ReceiptSerializer
+from .models import Account, AlternatePhone, Category, Media, Product, Campus, Sponsored, EHaggler, Messenger, EShop, SubCategory, EShopProduct, EShopCategory, RateReview, ClientRateReview, EShopRateReview, FavoriteClient, FavoriteProduct, FavoriteEShop, Trending, Blog, ForgotPassword, PaymentMethod, Transaction, Sold, NotFound, TopSearched, TopForSell
+from .serializers import AccountSerializer, AlternatePhoneSerializer, AddAccountSerializer,SignInSerializer, CategorySerializer, ResultListSerializer,CampusSerializer, TrendSerializer, SponsoredSerializer, ProductSerializer,MessageSerializer, HaggleClientSerializer, EShopSerializer, EShopExistSerializer, SubCategorySerializer, ClientRRSerializer, EShopRRSerializer, ProductImagesSerializer, ProductVideoSerializer, EShopStoreSerializer, ForgotPasswordSerializer, ErrorCheckSerializer, SuccessCodeSerializer, FavoriteListClient, FavoriteListEShop, FavoriteListProduct, ProductSnippetSerializer, AboutEShopSerializer, BlogSerializer, EShopCategorySerializer, PaymentMethodSerializer, TransactionSerializer, BuyerSerializer, ReceiptSerializer, BusinessSerializer, ProductValuationSerializer
 import random
 import string
 
@@ -1845,6 +1845,18 @@ class NewProductView(APIView):
             newProduct.starting_price = starting_price
             newProduct.save()
 
+            ## upForSell Products, business mode
+            try :
+                topForSell = TopForSell.objects.get(product_name = search_phrase)
+                topForSell.frequency = topForSell.frequency + 1
+                topForSell.save()
+
+            except:
+                topForSell = TopForSell()
+                topForSell.product_name = search_phrase
+                topForSell.save()
+
+
             code = newProduct.id
 
             success = {
@@ -2197,38 +2209,128 @@ class Search(APIView):
 
     def get(self, request,campus_id, category_id):
 
-        pass
+        search_phrase = "Samsung s5 edge"
+        search_bucket = search_phrase.split()
+
+        results = []
+        result_bucket = []
+
+        for word in search_bucket :
+
+            if category_id != '99' :
+
+                buffer_result =  Product.objects.filter(product_name__icontains = word,category_id=category_id, campus_id = campus_id, sold = False) | Product.objects.filter(description__icontains = word, category_id=category_id, campus_id = campus_id, sold = False) 
+                
+            
+            else:
+             
+                buffer_result = Product.objects.filter(product_name__icontains = word, campus_id = campus_id, sold = False) | Product.objects.filter(description__icontains = word, campus_id = campus_id, sold = False)
+       
+
+            result_bucket.append(buffer_result)
+
+         
+
+        for buffer in result_bucket :
+
+            for item in buffer :
+                
+
+                product_id = item.id
+                product_name = item.product_name
+                product_image = item.product_image
+                starting_price = item.starting_price
+
+                context_list = {
+                    'product_id': product_id,
+                    'product_name': product_name,
+                    'product_image' : product_image,
+                    'starting_price' : starting_price,
+                }
+
+                results.append(context_list)
+
+               
+
+        serializer = ResultListSerializer(results, many=True)
+
+        return Response(serializer.data)
+
+
+
+
 
     
     def post(self, request,campus_id, category_id):
 
         search_phrase = request.POST.get("search_phrase", "")
+        search_bucket = search_phrase.split()
+
         results = []
+        result_bucket_list = []
 
-        if category_id != '99' :
+        for word in search_bucket :
 
-            buffer_result =  Product.objects.filter(product_name__icontains = search_phrase,category_id=category_id, campus_id = campus_id) | Product.objects.filter(description__icontains = search_phrase, category_id=category_id, campus_id = campus_id) 
+            if category_id != '99' :
 
-        else:
+                buffer_result =  Product.objects.filter(product_name__icontains = word,category_id=category_id, campus_id = campus_id, sold = False) | Product.objects.filter(description__icontains = word, category_id=category_id, campus_id = campus_id, sold = False) 
+
+            else:
              
-            buffer_result = Product.objects.filter(product_name__icontains = search_phrase, campus_id = campus_id) | Product.objects.filter(description__icontains = search_phrase, campus_id = campus_id)
+                buffer_result = Product.objects.filter(product_name__icontains = word, campus_id = campus_id, sold = False) | Product.objects.filter(description__icontains = word, campus_id = campus_id, sold = False)
     
+            result_bucket_list.append(buffer_result)
 
-        for buffer in buffer_result :
+         
 
-            product_id = buffer.id
-            product_name = buffer.product_name
-            product_image = buffer.product_image
-            starting_price = buffer.starting_price
+        for buffer in result_bucket_list :
 
-            context_list = {
-                'product_id': product_id,
-                'product_name': product_name,
-                'product_image' : product_image,
-                'starting_price' : starting_price,
-            }
+            for item in buffer :
 
-            results.append(context_list)
+                product_id = item.id
+                product_name = item.product_name
+                product_image = item.product_image
+                starting_price = item.starting_price
+
+                context_list = {
+                    'product_id': product_id,
+                    'product_name': product_name,
+                    'product_image' : product_image,
+                    'starting_price' : starting_price,
+                }
+
+                results.append(context_list)
+
+            
+
+        ## Search Products, business mode
+        try :
+            top_searched = TopSearched.objects.get(product_name = search_phrase)
+            top_searched.frequency = top_searched.frequency + 1
+            top_searched.save()
+
+        except:
+            top_searched = TopSearched()
+            top_searched.product_name = search_phrase
+            top_searched.save()
+
+        
+        ## Not Found, business mode
+        if results:
+            pass
+        
+        else:
+
+            try :
+                not_found = NotFound.objects.get(product_name = search_phrase)
+                not_found.frequency = not_found.frequency + 1
+                not_found.save()
+
+            except:
+                not_found = NotFound()
+                not_found.product_name = search_phrase
+                not_found.save()
+            
 
                
 
@@ -2577,7 +2679,7 @@ class HaggleClients(APIView):
             account = get_account(request)
             account_id = account.id
 
-            chats = EHaggler.objects.filter(account_1 = account_id) | EHaggler.objects.filter(account_2 = account_id)
+            chats = EHaggler.objects.filter(account_1_id = account_id) | EHaggler.objects.filter(account_2 = account_id)
 
             client_register = []
             if chats !=  0 :
@@ -2683,7 +2785,7 @@ class HaggleClients(APIView):
 
 
 
-class NewHagglers(APIView):
+class NewHaggler(APIView):
 
     def get(self, request, client_id):
 
@@ -2692,7 +2794,7 @@ class NewHagglers(APIView):
             account = get_account(request)
             account_id = account.id
 
-            account_2 = Account.objects.get( id = client_id)
+            account_2 = Account.objects.get( id = client_id )
 
         except:
 
@@ -2707,10 +2809,21 @@ class NewHagglers(APIView):
             return Response(serializer.data)
 
 
-        try:
+        is_chat = False
 
-            chat_exist = EHaggler.objects.get(account_1_id = client_id, account_2 = account_id)
-            chat_exist = EHaggler.objects.get(account_1_id = account_id, account_2 = client_id)
+        try:
+            chat_exist_1 = EHaggler.objects.get(account_1_id = client_id, account_2 = account_id)
+            is_chat = True
+        except:
+            pass
+
+        try:
+            chat_exist_2 = EHaggler.objects.get(account_1_id = account_id, account_2 = client_id)
+            is_chat = True
+        except:
+            pass
+
+        if is_chat:
 
             code = 11
 
@@ -2722,7 +2835,7 @@ class NewHagglers(APIView):
 
             return Response(serializer.data)
 
-        except : 
+        else:
 
             ehaggler = EHaggler()
             ehaggler.account_1 = account
@@ -2738,6 +2851,12 @@ class NewHagglers(APIView):
             serializer = SuccessCodeSerializer(success, many= False)
 
             return Response(serializer.data)
+
+
+
+      
+           
+           
 
     
     def post(self, request, client_id):
@@ -4164,6 +4283,66 @@ class EShopSearch(APIView):
 
 
 
+class Rating(APIView):
+
+    def get(self, request, eshop_id):
+        
+        if True:
+            eshop_rating = EShopRateReview.objects.filter(eshop_id = eshop_id)
+            
+            rating_count = 0
+            rating_no = 0
+
+            for item in eshop_rating:
+
+                ratereview = RateReview.objects.get(id = item.ratereview_id)
+
+                rating_no = rating_no + 1
+
+                rating_count = rating_count + ratereview.rating
+
+            
+            final_rating = int(rating_count / rating_no)
+
+            return Response(final_rating)
+
+
+        else:
+            pass
+
+        return Response(0)
+    
+    def post(self, request, eshop_id):
+        pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5345,6 +5524,26 @@ class ConfirmTransactionSeller(APIView):
             transaction.save()
 
 
+            ## Sold, business mode
+            try: 
+                product = Product.object.get(id = transaction.product_id)
+                product_name = product.product_name
+
+                try :
+                    sold = Sold.objects.get(product_name = product_name)
+                    sold.frequency = sold.frequency + 1
+                    sold.save()
+
+                except:
+                    sold = Sold()
+                    sold.product_name = product_name
+                    sold.save()
+                
+            except:
+                pass
+
+
+
             return Response(True)
 
         except:
@@ -5642,6 +5841,400 @@ class TransactionStatus(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class TopSearchedView(APIView):
+
+    def get(self, request):
+        top_seached = TopSearched.objects.all()
+
+        serializer = BusinessSerializer(top_seached, many=True)
+
+        return Response(serializer.data)
+
+    
+    def post(self, request):
+        pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class TopSoldView(APIView):
+
+    def get(self, request):
+        top_sold = Sold.objects.all()
+
+        serializer = BusinessSerializer(top_sold, many=True)
+
+        return Response(serializer.data)
+
+    
+    def post(self, request):
+        pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class TopForSellView(APIView):
+
+    def get(self, request):
+        top_for_sell = TopForSell.objects.all()
+
+        serializer = BusinessSerializer(top_for_sell, many=True)
+
+        return Response(serializer.data)
+
+    
+    def post(self, request):
+        pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class TopNotFoundView(APIView):
+
+    def get(self, request):
+        
+        top_not_found = NotFound.objects.all()
+
+        serializer = BusinessSerializer(top_not_found, many=True)
+
+        return Response(serializer.data)
+
+    
+    def post(self, request):
+        pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class LeastSoldView(APIView):
+
+    def get(self, request):
+        
+        least_sold = Sold.objects.all().reverse()
+
+        serializer = BusinessSerializer(least_sold, many=True)
+
+        return Response(serializer.data)
+
+    
+    def post(self, request):
+        pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class LeastForSellView(APIView):
+
+    def get(self, request):
+        
+        least_for_sell = TopForSell.objects.all().reverse()
+
+        serializer = BusinessSerializer(least_for_sell, many=True)
+
+        return Response(serializer.data)
+
+    
+    def post(self, request):
+        pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class ProductValuation(APIView):
+
+    def get(self, request):
+        pass
+
+    
+    def post(self, request):
+
+        product = request.POST.get("product","")
+
+        try:
+            searched  = TopSearched.objects.get(product_name = product)
+            searched_frequency = searched.frequency
+
+        except:
+            searched_frequency = 0
+
+        
+        try:
+            notFound  = NotFound.objects.get(product_name = product)
+            notFound_frequency = notFound.frequency
+
+        except:
+            notFound_frequency = 0
+
+        
+        try:
+            forSell  = TopForSell.objects.get(product_name = product)
+            forSell_frequency = forSell.frequency
+
+        except:
+            forSell_frequency = 0
+
+
+        try:
+            sold = Sold.objects.get(product_name = product)
+            sold_frequency = sold.frequency
+
+        except:
+            sold_frequency = 0
+
+        product_review = {
+            'searched_frequency' : searched_frequency,
+            'notFound_frequency' : notFound_frequency,
+            'forSell_frequency' : forSell_frequency,
+            'sold_frequency' : sold_frequency
+        }
+
+        serializer = ProductValuationSerializer( product_review, many= False)
+
+        return Response(serializer.data)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class AlternatePhoneView(APIView):
+
+    def get(self, request):
+
+        try:
+            account = get_account(request)
+
+            alternate_phone = AlternatePhone.objects.get(account_id = 5)
+
+            serializer = AlternatePhoneSerializer(alternate_phone, many=False)
+
+            return Response(serializer.data)
+
+        except:
+            pass  
+
+        empty_set = {}
+        return Response(empty_set)      
+
+    
+    def post(self, request):
+        
+        try:
+            account = get_account(request)
+
+            phone1 = request.POST.get("phone1","")
+            phone2 = request.POST.get("phone2","")
+
+            try :
+                alternate_phone = AlternatePhone.objects.get(account_id = 5)
+                
+                if phone1:
+                    alternate_phone.phone1 = phone1
+                
+                if phone2:
+                    alternate_phone.phone2 = phone2
+
+                alternate_phone.save()
+
+            except:
+                alternate_phone = AlternatePhone()
+                alternate_phone.account = account
+                alternate_phone.phone1 = phone1
+                alternate_phone.phone2 = phone2
+                alternate_phone.save()
+
+
+        except:
+            pass 
+
+
+        empty_set = {}
+        return Response(empty_set)     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class GetPhone(APIView):
+
+    def get(self, request):
+        
+        try:
+            account = get_account(request)
+            phone = account.phone
+
+            return Response(phone)
+
+        except:
+            pass
+        
+        empty_set = {}
+        return Response(empty_set)
+
+    
+    def post(self, request):
+        pass
 
 
 

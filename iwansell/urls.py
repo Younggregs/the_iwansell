@@ -150,7 +150,7 @@ urlpatterns = [
     url(r'^haggleclients/$',views.HaggleClients.as_view(), name = 'haggle-clients'),
 
     #iwansell/haggleclients
-    url(r'^new_hagglers/(?P<client_id>[0-9]+)/$',views.NewHagglers.as_view(), name = 'new-hagglers'),
+    url(r'^new_hagglers/(?P<client_id>[0-9]+)/$',views.NewHaggler.as_view(), name = 'new-haggler'),
 
     #iwansell/messenger
     url(r'^messenger/(?P<client_id>[0-9]+)/$',views.MessengerView.as_view(), name = 'messenger'),
@@ -191,6 +191,9 @@ urlpatterns = [
     #iwansell/rate_review/status_code/id
     url(r'^rate_review/(?P<status_code>[0-9]+)/(?P<id>[0-9]+)/$',views.RRView.as_view(), name = 'rr-view'),
 
+    #iwansell/rating/eshop_id
+    url(r'^rating/(?P<eshop_id>[0-9]+)/$',views.Rating.as_view(), name = 'rating'),
+
     #iwansell/rate_review/status_code/id
     url(r'^rate_review_form/(?P<status_code>[0-9]+)/(?P<id>[0-9]+)/$',views.RRViewForm.as_view(), name = 'rr-view-form'),
 
@@ -226,6 +229,33 @@ urlpatterns = [
 
     #iwansell/blog_snippet
     url(r'^blog_snippet/$',views.BlogSnippet.as_view(), name = 'blog-snippet'),
+
+    #iwansell/top_sold
+    url(r'^top_sold/$',views.TopSoldView.as_view(), name = 'top-sold-view'),
+
+    #iwansell/top_search_product
+    url(r'^top_search_product/$',views.TopSearchedView.as_view(), name = 'top-searched-view'),
+
+    #iwansell/top_not_found
+    url(r'^top_not_found/$',views.TopNotFoundView.as_view(), name = 'top-not-found-view'),
+
+    #iwansell/top_for_sell
+    url(r'^top_for_sell/$',views.TopForSellView.as_view(), name = 'top-for-sell-view'),
+
+    #iwansell/least_sold
+    url(r'^least_sold/$',views.LeastSoldView.as_view(), name = 'least-sold-view'),
+
+    #iwansell/least_for_sell
+    url(r'^least_for_sell/$',views.LeastForSellView.as_view(), name = 'least-for-sell-view'),
+
+    #iwansell/product_valuation
+    url(r'^product_valuation/$',views.ProductValuation.as_view(), name = 'product-valuation'),
+
+    #iwansell/alternate_phone
+    url(r'^alternate_phone/$',views.AlternatePhoneView.as_view(), name = 'alternate-phone'),
+
+    #iwansell/get_phone
+    url(r'^get_phone/$',views.GetPhone.as_view(), name = 'get-phone'),
 
     #iwansell/forgot_password
     url(r'^forgot_password/$',views.ForgotPasswordView.as_view(), name = 'forgot-password'),
