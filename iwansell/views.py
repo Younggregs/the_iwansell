@@ -3375,7 +3375,7 @@ class NewEShop(APIView):
                     eshop_category.category = idd
 
 
-                code = eshop.id
+                code = int(eshop.id)
 
                 success = {
                     'code' : code
