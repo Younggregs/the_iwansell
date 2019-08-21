@@ -161,6 +161,9 @@ urlpatterns = [
     #iwansell/send_message
     url(r'^send_message/(?P<client_id>[0-9]+)/$',views.SendMessage.as_view(), name = 'send-message'),
 
+    #iwansell/campus_code
+    url(r'^campus_code/(?P<campus_id>[0-9]+)/$',views.CampusCode.as_view(), name = 'campus_code'),
+
     #iwansell/new_eshop
     url(r'^new_eshop/$',views.NewEShop.as_view(), name = 'new-eshop'),
 
@@ -254,8 +257,63 @@ urlpatterns = [
     #iwansell/alternate_phone
     url(r'^alternate_phone/$',views.AlternatePhoneView.as_view(), name = 'alternate-phone'),
 
+    #iwansell/alternate_phone_seller
+    url(r'^alternate_phone_seller/(?P<account_id>[0-9]+)/$',views.AlternatePhoneSellerView.as_view(), name = 'alternate-phone-seller'),
+    
     #iwansell/get_phone
     url(r'^get_phone/$',views.GetPhone.as_view(), name = 'get-phone'),
+
+    #iwansell/channel
+    url(r'^channel/(?P<campus_id>[0-9]+)/$',views.ChannelView.as_view(), name = 'channel'),
+
+    #iwansell/get_channel
+    url(r'^get_channel/$',views.GetChannel.as_view(), name = 'getchannel'),
+
+    #iwansell/thread
+    url(r'^thread/(?P<thread_id>[0-9]+)/$',views.ThreadView.as_view(), name = 'thread'),
+
+    #iwansell/comment/1
+    url(r'^comment/(?P<thread_id>[0-9]+)/$',views.CommentView.as_view(), name = 'comment-view'),
+
+    #iwansell/reply/1
+    url(r'^reply/(?P<comment_id>[0-9]+)/$',views.ReplyView.as_view(), name = 'reply-view'),
+
+    #iwansell/reply_1/1
+    url(r'^reply_1/(?P<reply_id>[0-9]+)/$',views.Reply1View.as_view(), name = 'reply-1-view'),
+
+    #iwansell/reply_2/1
+    url(r'^reply_2/(?P<reply_id>[0-9]+)/$',views.Reply2View.as_view(), name = 'reply-3-view'),
+
+    #iwansell/reply_3/1
+    url(r'^reply_3/(?P<reply_id>[0-9]+)/$',views.Reply3View.as_view(), name = 'reply-3-view'),
+
+    #iwansell/reply_4/1
+    url(r'^reply_4/(?P<reply_id>[0-9]+)/$',views.Reply4View.as_view(), name = 'reply-4-view'),
+    
+    #iwansell/follow
+    url(r'^follow/(?P<channel_id>[0-9]+)/$',views.FollowView.as_view(), name = 'follow'),
+
+    #iwansell/vote
+    url(r'^vote/(?P<toggle>[0-9]+)/(?P<thread_id>[0-9]+)/$',views.VoteView.as_view(), name = 'vote-view'),
+
+    #iwansell/vote_comment
+    url(r'^vote_comment/(?P<toggle>[0-9]+)/(?P<comment_id>[0-9]+)/$',views.VoteComment.as_view(), name = 'vote-comment'),
+
+    #iwansell/vote_reply
+    url(r'^vote_reply/(?P<toggle>[0-9]+)/(?P<reply_id>[0-9]+)/$',views.VoteReply.as_view(), name = 'vote-reply'),
+
+    #iwansell/vote_reply
+    url(r'^vote_reply_1/(?P<toggle>[0-9]+)/(?P<reply_id>[0-9]+)/$',views.VoteReply1.as_view(), name = 'vote-reply-1'),
+
+    #iwansell/vote_reply
+    url(r'^vote_reply_2/(?P<toggle>[0-9]+)/(?P<reply_id>[0-9]+)/$',views.VoteReply2.as_view(), name = 'vote-reply-2'),
+
+    #iwansell/vote_reply
+    url(r'^vote_reply_3/(?P<toggle>[0-9]+)/(?P<reply_id>[0-9]+)/$',views.VoteReply3.as_view(), name = 'vote-reply-3'),
+
+    #iwansell/vote_reply
+    url(r'^vote_reply_4/(?P<toggle>[0-9]+)/(?P<reply_id>[0-9]+)/$',views.VoteReply4.as_view(), name = 'vote-reply-4'),
+
 
     #iwansell/forgot_password
     url(r'^forgot_password/$',views.ForgotPasswordView.as_view(), name = 'forgot-password'),
@@ -265,4 +323,20 @@ urlpatterns = [
 
     #iwansell/logout
     url(r'^logout/$', views.logout, name='logout'),
+
+     #iwansell/new_listing
+    url(r'^new_listing/(?P<account_id>[0-9]+)/$',views.NewListingView.as_view(), name = 'new-listing'),
+
+    #iwansell/listings
+    url(r'^listings/(?P<campus_id>[0-9]+)/$',views.ListingView.as_view(), name = 'listing'),
+
+    #iwansell/listing_category
+    url(r'^listing_category/(?P<campus_id>[0-9]+)/(?P<category_id>[0-9]+)/$',views.ListingCategory.as_view(), name = 'listing_category'),
+
+    #iwansell/listing_product
+    url(r'^listing_product/$',views.ListingProduct.as_view(), name = 'listing_product'),
+
+    #iwansell/remove_listing
+    url(r'^remove_listing/(?P<product_id>[0-9]+)/(?P<status>[0-9]+)/$',views.RemoveListing.as_view(), name = 'remove_listing'),
+
 ]

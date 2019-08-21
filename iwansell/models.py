@@ -236,16 +236,25 @@ class RateReview(models.Model):
         return self.review
 
 
+
 class ClientRateReview(models.Model):
     ratereview = models.ForeignKey(RateReview, on_delete=models.CASCADE)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    date = models.DateTimeField(default = timezone.now)
+
+
+    class Meta:
+        ordering = ['-date']
 
 
 class EShopRateReview(models.Model):
     ratereview = models.ForeignKey(RateReview, on_delete=models.CASCADE)
     eshop = models.ForeignKey(EShop, on_delete=models.CASCADE)
+    date = models.DateTimeField(default = timezone.now)
 
 
+    class Meta:
+        ordering = ['-date']
 
 
 class Blog(models.Model):
@@ -350,12 +359,230 @@ class TopForSell(models.Model):
 
 
 
-
-
-
-
     
 
 
+###### New ##########
+
+class Listing(models.Model):
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    campus = models.ForeignKey(Campus, on_delete=models.CASCADE)
+    product_name = models.CharField(max_length= 200)
+    product_description = models.TextField()
+    product_image = models.FileField()
+    budget = models.CharField(max_length=100)
+    success = models.BooleanField(default = False)
+    status = models.BooleanField(default = False)
+    date = models.DateTimeField(default = timezone.now)
+
+    class Meta:
+        ordering = ['-date']
+
+    def __str__(self):
+         return self.product_name
+
+
+
+class Channel(models.Model):
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    campus = models.ForeignKey(Campus, on_delete=models.CASCADE)
+    channel = models.CharField(max_length= 200)
+    catch = models.CharField(max_length = 100)
+    logo = models.FileField()
+    date = models.DateTimeField(default = timezone.now)
+
+    def __str__(self):
+        return self.channel
+
+
+
+
+class Following(models.Model):
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
+    date = models.DateTimeField(default = timezone.now)
+
+    class Meta:
+        ordering = ['-date']
+
+
+
+class Thread(models.Model):
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, default=4)
+    channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
+    campus = models.ForeignKey(Campus, on_delete=models.CASCADE, default=1)
+    title = models.CharField(max_length= 200)
+    thread = models.TextField()
+    media = models.FileField()
+    date = models.DateTimeField(default = timezone.now)
+
+    class Meta:
+        ordering = ['-date']
+
+    def __str__(self):
+        return self.thread
+
+
+
+class ThreadVote(models.Model):
+    thread = models.ForeignKey(Thread, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    upvote = models.BooleanField(default=False)
+    downvote = models.BooleanField(default=False)
+    date = models.DateTimeField(default = timezone.now)
+
+    def __str__(self):
+         return self.upvote + ' ' + self.downvote
+
+
+
+
+
+
+class Comment(models.Model):
+    thread = models.ForeignKey(Thread, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    comment = models.TextField()
+    date = models.DateTimeField(default = timezone.now)
+
+
+    def __str__(self):
+        return self.comment
+
+    class Meta:
+        ordering = ['-date']
+
+
+
+class CommentVote(models.Model):
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    upvote = models.BooleanField(default=False)
+    downvote = models.BooleanField(default=False)
+    date = models.DateTimeField(default = timezone.now)
+
+    def __str__(self):
+        return self.vote
+
+
+
+class Reply(models.Model):
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    reply = models.TextField()
+    date = models.DateTimeField(default = timezone.now)
+
+    def __str__(self):
+        return self.reply
+
+
+    class Meta:
+        ordering = ['-date']
+
+
+class ReplyVote(models.Model):
+    reply = models.ForeignKey(Reply, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    upvote = models.BooleanField(default=False)
+    downvote = models.BooleanField(default=False)
+    date = models.DateTimeField(default = timezone.now)
+
+
+
+###### Reply1
+class Reply1(models.Model):
+    reply = models.ForeignKey(Reply, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    reply_t = models.TextField()
+    date = models.DateTimeField(default = timezone.now)
+
+    def __str__(self):
+        return self.reply
+
+
+    class Meta:
+        ordering = ['-date']
+
+
+class Reply1Vote(models.Model):
+    reply1 = models.ForeignKey(Reply1, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    upvote = models.BooleanField(default=False)
+    downvote = models.BooleanField(default=False)
+    date = models.DateTimeField(default = timezone.now)
+
+
+######## Reply2 #######
+class Reply2(models.Model):
+    reply1 = models.ForeignKey(Reply1, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    reply = models.TextField()
+    date = models.DateTimeField(default = timezone.now)
+
+    def __str__(self):
+        return self.reply
+
+
+    class Meta:
+        ordering = ['-date']
+
+
+class Reply2Vote(models.Model):
+    reply2 = models.ForeignKey(Reply2, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    upvote = models.BooleanField(default=False)
+    downvote = models.BooleanField(default=False)
+    date = models.DateTimeField(default = timezone.now)
+
+
+
+
+####### Reply3
+class Reply3(models.Model):
+    reply2 = models.ForeignKey(Reply2, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    reply = models.TextField()
+    date = models.DateTimeField(default = timezone.now)
+
+    def __str__(self):
+        return self.reply
+
+
+    class Meta:
+        ordering = ['-date']
+
+
+class Reply3Vote(models.Model):
+    reply3 = models.ForeignKey(Reply3, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    upvote = models.BooleanField(default=False)
+    downvote = models.BooleanField(default=False)
+    date = models.DateTimeField(default = timezone.now)
+
+
+
+
+######Reply4
+class Reply4(models.Model):
+    reply3 = models.ForeignKey(Reply3, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    reply = models.TextField()
+    date = models.DateTimeField(default = timezone.now)
+
+    def __str__(self):
+        return self.reply
+
+
+    class Meta:
+        ordering = ['-date']
+
+
+class Reply4Vote(models.Model):
+    reply4 = models.ForeignKey(Reply4, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    upvote = models.BooleanField(default=False)
+    downvote = models.BooleanField(default=False)
+    date = models.DateTimeField(default = timezone.now)
 
 

@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Account, AlternatePhone, Category, SubCategory, Campus, Sponsored, Product, EShop, RateReview, Trending, Media, Blog, PaymentMethod, ForgotPassword
+from .models import Listing, Account, AlternatePhone, Category, SubCategory, Campus, Sponsored, Product, EShop, RateReview, Trending, Media, Blog, PaymentMethod, ForgotPassword
+
 
 class AccountSerializer(serializers.ModelSerializer):
 
@@ -66,8 +67,8 @@ class ResultListSerializer(serializers.Serializer):
 class TrendSerializer(serializers.ModelSerializer):
 
    class Meta:
-        model = Trending
-        fields = ['id', 'product_image']
+       model = Product
+       fields = ['id', 'product_image', 'product_name', 'starting_price']
 
 
 
@@ -164,7 +165,7 @@ class AboutEShopSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     boss = serializers.CharField()
     phone = serializers.CharField()
-
+    dp = serializers.CharField()
 
 
 
@@ -289,5 +290,67 @@ class ProductValuationSerializer(serializers.Serializer):
 
 
 
+class ListingSerializer(serializers.Serializer):
 
+    product_name = serializers.CharField()
+    product_description = serializers.CharField()
+    product_image = serializers.CharField()
+    budget = serializers.CharField()
+    phone = serializers.CharField()
+
+
+
+class ListingProductSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Listing
+        fields = '__all__'
+
+
+
+
+
+class ThreadSerializer(serializers.Serializer):
+
+    firstname = serializers.CharField()
+    lastname = serializers.CharField()
+    title = serializers.CharField()
+    thread_id = serializers.IntegerField()
+    thread = serializers.CharField()
+    media = serializers.CharField()
+    logo = serializers.CharField()
+    votes = serializers.IntegerField()
+    comment_count = serializers.IntegerField()
+    channel_id = serializers.IntegerField()
+    channel = serializers.CharField()
+    following = serializers.CharField()
+    date = serializers.CharField()
+
+
+
+
+
+class CommentSerializer(serializers.Serializer):
+
+    firstname = serializers.CharField()
+    lastname = serializers.CharField()
+    dp = serializers.CharField()
+    comment_id = serializers.IntegerField()
+    comment = serializers.CharField()
+    comment_count = serializers.IntegerField()
+    votes = serializers.IntegerField()
+    date = serializers.CharField()
+
+
+
+class ReplySerializer(serializers.Serializer):
+
+    firstname = serializers.CharField()
+    lastname = serializers.CharField()
+    dp = serializers.CharField()
+    reply_id = serializers.IntegerField()
+    reply = serializers.CharField()
+    reply_count = serializers.IntegerField()
+    votes = serializers.IntegerField()
+    date = serializers.CharField()
 
