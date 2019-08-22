@@ -1,5 +1,8 @@
 from rest_framework import serializers
-from .models import Listing, Account, AlternatePhone, Category, SubCategory, Campus, Sponsored, Product, EShop, RateReview, Trending, Media, Blog, PaymentMethod, ForgotPassword
+from .models import Account, AlternatePhone, Category, SubCategory, Campus, Sponsored, Product, EShop, RateReview, Trending, Media, Blog, PaymentMethod, ForgotPassword, Listing, Thread, Comment, Reply
+
+
+
 
 
 class AccountSerializer(serializers.ModelSerializer):
@@ -9,11 +12,19 @@ class AccountSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+
+
+
+
 class AddAccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
         fields = ['firstname','lastname','phone','campus','password']
+
+
+
+
 
 
 class AlternatePhoneSerializer(serializers.ModelSerializer):
@@ -23,10 +34,22 @@ class AlternatePhoneSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+
+
+
+
+
 class SignInSerializer(serializers.Serializer):
 
         username = serializers.CharField()
         password = serializers.IntegerField()
+
+
+
+
+
+
+
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -35,11 +58,25 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ['id', 'name', 'image', 'icon']
 
+
+
+
+
+
+
+
 class SubCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SubCategory
         fields = ['id', 'name', 'image']
+
+
+
+
+
+
+
 
 
 class BlogSerializer(serializers.ModelSerializer):
@@ -49,11 +86,29 @@ class BlogSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+
+
+
+
+
+
+
+
+
 class CampusSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Campus
         fields = ['id', 'campus_code']
+
+
+
+
+
+
+
+
+
 
 
 class ResultListSerializer(serializers.Serializer):
@@ -64,11 +119,33 @@ class ResultListSerializer(serializers.Serializer):
     starting_price = serializers.CharField()
 
 
+
+
+
+
+
+
+
+
+
+
 class TrendSerializer(serializers.ModelSerializer):
 
    class Meta:
-       model = Product
-       fields = ['id', 'product_image', 'product_name', 'starting_price']
+        model = Trending
+        fields = ['id', 'product_image', 'product_name', 'starting_price']
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -79,6 +156,17 @@ class EShopStoreSerializer(serializers.ModelSerializer):
        fields = ['id','product_name', 'product_image', 'starting_price']
 
 
+
+
+
+
+
+
+
+
+
+
+
 class SponsoredSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -87,11 +175,31 @@ class SponsoredSerializer(serializers.ModelSerializer):
 
     
 
+
+
+
+
+
+
+
+
+
+
 class PaymentMethodSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PaymentMethod
         fields = '__all__'
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -111,9 +219,72 @@ class ProductSerializer(serializers.Serializer):
 
 
 
+
+
+
+
+
+
+
+
+
+
+class ListingSerializer(serializers.Serializer):
+     
+    product_name = serializers.CharField()
+    product_description = serializers.CharField()
+    product_image = serializers.CharField()
+    budget = serializers.CharField()
+    phone = serializers.CharField()
+
+
+
+
+
+
+
+
+
+
+
+
+class ListingProductSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Listing
+        fields = '__all__'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class EShopCategorySerializer(serializers.Serializer):
     
     category_name = serializers.CharField()
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 class ProductSnippetSerializer(serializers.ModelSerializer):
@@ -125,11 +296,30 @@ class ProductSnippetSerializer(serializers.ModelSerializer):
 
 
 
+
+
+
+
+
+
+
+
+
+
 class ProductImagesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Media
         fields = ['image']
+
+
+
+
+
+
+
+
+
 
 
 class ProductVideoSerializer(serializers.ModelSerializer):
@@ -139,10 +329,26 @@ class ProductVideoSerializer(serializers.ModelSerializer):
         fields = ['video']
 
     
+
+
+
+
+
+
+
 class MessageSerializer(serializers.Serializer):
 
     msg = serializers.CharField()
     from_or_to = serializers.BooleanField()
+
+
+
+
+
+
+
+
+
 
 
 class HaggleClientSerializer(serializers.Serializer):
@@ -152,6 +358,20 @@ class HaggleClientSerializer(serializers.Serializer):
     haggle_id = serializers.IntegerField()
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class EShopSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -159,19 +379,52 @@ class EShopSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+
+
+
+
+
+
+
+
+
+
     
 class AboutEShopSerializer(serializers.Serializer):
 
     id = serializers.IntegerField()
     boss = serializers.CharField()
-    phone = serializers.CharField()
     dp = serializers.CharField()
+    phone = serializers.CharField()
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 class EShopExistSerializer(serializers.Serializer):
 
     eshop_exist = serializers.BooleanField()
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -184,12 +437,34 @@ class ClientRRSerializer(serializers.Serializer):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class EShopRRSerializer(serializers.Serializer):
 
     client_name = serializers.CharField()
     client_image = serializers.CharField()
     rating = serializers.IntegerField()
     review = serializers.CharField()
+
+
+
+
+
+
+
+
 
 
 class FavoriteListClient(serializers.Serializer):
@@ -201,11 +476,32 @@ class FavoriteListClient(serializers.Serializer):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 class FavoriteListEShop(serializers.Serializer):
 
     eshop_name = serializers.CharField()
     eshop_id = serializers.IntegerField()
     catchboard = serializers.CharField()
+
+
+
+
+
+
+
+
+
+
 
 
 class FavoriteListProduct(serializers.Serializer):
@@ -216,6 +512,19 @@ class FavoriteListProduct(serializers.Serializer):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 class ForgotPasswordSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -223,14 +532,40 @@ class ForgotPasswordSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     
+
+
+
+
+
+
+
+
+
+
 class ErrorCheckSerializer(serializers.Serializer):
 
     error_message = serializers.CharField()
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 class SuccessCodeSerializer(serializers.Serializer):
 
     code = serializers.IntegerField()
+
+
+
+
 
 
 
@@ -249,10 +584,28 @@ class TransactionSerializer(serializers.Serializer):
 
 
 
+
+
+
+
+
+
+
+
+
 class BuyerSerializer(serializers.Serializer):
 
     transaction_id = serializers.IntegerField()
     buyer = serializers.CharField()
+
+
+
+
+
+
+
+
+
 
 
 
@@ -273,11 +626,35 @@ class ReceiptSerializer(serializers.Serializer):
     date = serializers.CharField()
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class BusinessSerializer(serializers.Serializer):
 
     id = serializers.IntegerField()
     product_name = serializers.CharField()
     frequency = serializers.IntegerField()
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -290,21 +667,14 @@ class ProductValuationSerializer(serializers.Serializer):
 
 
 
-class ListingSerializer(serializers.Serializer):
-
-    product_name = serializers.CharField()
-    product_description = serializers.CharField()
-    product_image = serializers.CharField()
-    budget = serializers.CharField()
-    phone = serializers.CharField()
 
 
 
-class ListingProductSerializer(serializers.ModelSerializer):
 
-    class Meta:
-        model = Listing
-        fields = '__all__'
+
+
+
+
 
 
 
@@ -330,6 +700,16 @@ class ThreadSerializer(serializers.Serializer):
 
 
 
+
+
+
+
+
+
+
+
+
+
 class CommentSerializer(serializers.Serializer):
 
     firstname = serializers.CharField()
@@ -343,6 +723,20 @@ class CommentSerializer(serializers.Serializer):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class ReplySerializer(serializers.Serializer):
 
     firstname = serializers.CharField()
@@ -353,4 +747,3 @@ class ReplySerializer(serializers.Serializer):
     reply_count = serializers.IntegerField()
     votes = serializers.IntegerField()
     date = serializers.CharField()
-

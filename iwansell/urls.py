@@ -50,6 +50,9 @@ urlpatterns = [
     #iwansell/eshop_list/campus_id
     url(r'^eshop_list/(?P<campus_id>[0-9]+)/$',views.EShopList.as_view(), name = 'eshop_list'),
 
+    #iwansell/campus_code
+    url(r'^campus_code/(?P<campus_id>[0-9]+)/$',views.CampusCode.as_view(), name = 'campus_code'),
+
     #iwansell/eshop_list_category
     url(r'^eshop_list_category/(?P<campus_id>[0-9]+)/(?P<category_id>[0-9]+)/$',views.EShopListCategory.as_view(), name = 'eshop_list_category'),
 
@@ -91,6 +94,21 @@ urlpatterns = [
 
     #iwansell/newproduct
     url(r'^newproduct/(?P<account_id>[0-9]+)/$',views.NewProductView.as_view(), name = 'new-product'),
+
+    #iwansell/new_listing
+    url(r'^new_listing/(?P<account_id>[0-9]+)/$',views.NewListingView.as_view(), name = 'new-listing'),
+
+    #iwansell/listings
+    url(r'^listings/(?P<campus_id>[0-9]+)/$',views.ListingView.as_view(), name = 'listing'),
+
+    #iwansell/listing_category
+    url(r'^listing_category/(?P<campus_id>[0-9]+)/(?P<category_id>[0-9]+)/$',views.ListingCategory.as_view(), name = 'listing_category'),
+
+    #iwansell/listing_product
+    url(r'^listing_product/$',views.ListingProduct.as_view(), name = 'listing_product'),
+
+    #iwansell/remove_listing
+    url(r'^remove_listing/(?P<product_id>[0-9]+)/(?P<status>[0-9]+)/$',views.RemoveListing.as_view(), name = 'remove_listing'),
 
     #iwansell/media_upload
     url(r'^media_upload/(?P<product_id>[0-9]+)/$',views.MediaUpload.as_view(), name = 'media-upload'),
@@ -160,9 +178,6 @@ urlpatterns = [
 
     #iwansell/send_message
     url(r'^send_message/(?P<client_id>[0-9]+)/$',views.SendMessage.as_view(), name = 'send-message'),
-
-    #iwansell/campus_code
-    url(r'^campus_code/(?P<campus_id>[0-9]+)/$',views.CampusCode.as_view(), name = 'campus_code'),
 
     #iwansell/new_eshop
     url(r'^new_eshop/$',views.NewEShop.as_view(), name = 'new-eshop'),
@@ -259,7 +274,7 @@ urlpatterns = [
 
     #iwansell/alternate_phone_seller
     url(r'^alternate_phone_seller/(?P<account_id>[0-9]+)/$',views.AlternatePhoneSellerView.as_view(), name = 'alternate-phone-seller'),
-    
+
     #iwansell/get_phone
     url(r'^get_phone/$',views.GetPhone.as_view(), name = 'get-phone'),
 
@@ -289,7 +304,7 @@ urlpatterns = [
 
     #iwansell/reply_4/1
     url(r'^reply_4/(?P<reply_id>[0-9]+)/$',views.Reply4View.as_view(), name = 'reply-4-view'),
-    
+
     #iwansell/follow
     url(r'^follow/(?P<channel_id>[0-9]+)/$',views.FollowView.as_view(), name = 'follow'),
 
@@ -314,29 +329,13 @@ urlpatterns = [
     #iwansell/vote_reply
     url(r'^vote_reply_4/(?P<toggle>[0-9]+)/(?P<reply_id>[0-9]+)/$',views.VoteReply4.as_view(), name = 'vote-reply-4'),
 
-
     #iwansell/forgot_password
     url(r'^forgot_password/$',views.ForgotPasswordView.as_view(), name = 'forgot-password'),
 
     #iwansell/forgot_password
-    url(r'^reset_password/(?P<reset_code>[0-9]+)/$',views.ResetPassword.as_view(), name = 'reset-password'),
+    url(r'^reset_password/(?P<reset_code>\w+)/$',views.ResetPassword.as_view(), name = 'reset-password'),
 
     #iwansell/logout
     url(r'^logout/$', views.logout, name='logout'),
-
-     #iwansell/new_listing
-    url(r'^new_listing/(?P<account_id>[0-9]+)/$',views.NewListingView.as_view(), name = 'new-listing'),
-
-    #iwansell/listings
-    url(r'^listings/(?P<campus_id>[0-9]+)/$',views.ListingView.as_view(), name = 'listing'),
-
-    #iwansell/listing_category
-    url(r'^listing_category/(?P<campus_id>[0-9]+)/(?P<category_id>[0-9]+)/$',views.ListingCategory.as_view(), name = 'listing_category'),
-
-    #iwansell/listing_product
-    url(r'^listing_product/$',views.ListingProduct.as_view(), name = 'listing_product'),
-
-    #iwansell/remove_listing
-    url(r'^remove_listing/(?P<product_id>[0-9]+)/(?P<status>[0-9]+)/$',views.RemoveListing.as_view(), name = 'remove_listing'),
 
 ]

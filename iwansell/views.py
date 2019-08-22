@@ -12,13 +12,15 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate , login
 from django.http import JsonResponse
+from django_random_queryset import RandomManager
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Thread, Channel, Following, ThreadVote, Comment, Reply, Reply1, Reply2, Reply3, Reply4, CommentVote, ReplyVote, Reply1Vote, Reply2Vote, Reply3Vote, Reply4Vote , Listing, Account, AlternatePhone, Category, Media, Product, Campus, Sponsored, EHaggler, Messenger, EShop, SubCategory, EShopProduct, EShopCategory, RateReview, ClientRateReview, EShopRateReview, FavoriteClient, FavoriteProduct, FavoriteEShop, Trending, Blog, ForgotPassword, PaymentMethod, Transaction,Sold, NotFound, TopSearched, TopForSell
-from .serializers import ThreadSerializer, CommentSerializer, ReplySerializer, ListingSerializer, ListingProductSerializer, AccountSerializer, AlternatePhoneSerializer, AddAccountSerializer,SignInSerializer, CategorySerializer, ResultListSerializer,CampusSerializer, TrendSerializer, SponsoredSerializer, ProductSerializer,MessageSerializer, HaggleClientSerializer, EShopSerializer, EShopExistSerializer, SubCategorySerializer, ClientRRSerializer, EShopRRSerializer, ProductImagesSerializer, ProductVideoSerializer, EShopStoreSerializer, ForgotPasswordSerializer, ErrorCheckSerializer, SuccessCodeSerializer, FavoriteListClient, FavoriteListEShop, FavoriteListProduct, ProductSnippetSerializer, AboutEShopSerializer, BlogSerializer, EShopCategorySerializer, PaymentMethodSerializer, TransactionSerializer, BuyerSerializer, ReceiptSerializer, BusinessSerializer, ProductValuationSerializer
+from .models import Account, AlternatePhone, Category, Media, Product, Campus, Sponsored, EHaggler, Messenger, EShop, SubCategory, EShopProduct, EShopCategory, RateReview, ClientRateReview, EShopRateReview, FavoriteClient, FavoriteProduct, FavoriteEShop, Trending, Blog, ForgotPassword, PaymentMethod, Transaction, Sold, NotFound, TopSearched, TopForSell, Listing, Thread, Channel, Following, ThreadVote, Comment, Reply, Reply1, Reply2, Reply3, Reply4, CommentVote, ReplyVote, Reply1Vote, Reply2Vote, Reply3Vote, Reply4Vote
+from .serializers import AccountSerializer, AlternatePhoneSerializer, AddAccountSerializer,SignInSerializer, CategorySerializer, ResultListSerializer,CampusSerializer, TrendSerializer, SponsoredSerializer, ProductSerializer,MessageSerializer, HaggleClientSerializer, EShopSerializer, EShopExistSerializer, SubCategorySerializer, ClientRRSerializer, EShopRRSerializer, ProductImagesSerializer, ProductVideoSerializer, EShopStoreSerializer, ForgotPasswordSerializer, ErrorCheckSerializer, SuccessCodeSerializer, FavoriteListClient, FavoriteListEShop, FavoriteListProduct, ProductSnippetSerializer, AboutEShopSerializer, BlogSerializer, EShopCategorySerializer, PaymentMethodSerializer, TransactionSerializer, BuyerSerializer, ReceiptSerializer, BusinessSerializer, ProductValuationSerializer, ListingSerializer, ListingProductSerializer, ThreadSerializer, CommentSerializer, ReplySerializer
 import random
 import string
+import tweepy
 
 
 
@@ -45,10 +47,73 @@ VIDEO_FILE_TYPES = ['webm', 'mp4', 'ogg']
 
 
 
+###########################
+#TraffleDraw
+###########################
+
+consumer_key = 'gRsXuMIT59JtyIv2to5oc9ovS'
+consumer_secret = '4e3jnVdmQLT7oce2lIbr1zU4wIE9FFXKFnK30SN98i62VVA0ap'
 
 
 
 
+
+def send_retweet(access_token='743877620706779136-SUgvFOrU7NaXSlxiKvcTXDnJL3dYxot', access_secret='DbFYyUrJ3gwU8N7aCtzooibhvet7LyO99yXQfte1x4AjZ', tweet_id = 1141470601711955968) : 
+
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(access_token, access_secret)
+
+    api = tweepy.API(auth)
+
+    rt_object = api.retweet(tweet_id)
+    
+    if rt_object: 
+
+        return 117
+    
+    return False
+
+
+
+def traffle_ticket_generator():
+
+    return random.randint(999999, 999999999)
+
+
+
+
+def get_tweet(access_token='743877620706779136-SUgvFOrU7NaXSlxiKvcTXDnJL3dYxot', access_secret='DbFYyUrJ3gwU8N7aCtzooibhvet7LyO99yXQfte1x4AjZ', tweet_id = 1141470601711955968):
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(access_token, access_secret)
+
+    api = tweepy.API(auth)
+
+    tweet = api.get_status(tweet_id)
+    if tweet: 
+        return tweet.text
+
+    return False
+
+
+
+def get_retweet(access_token='743877620706779136-SUgvFOrU7NaXSlxiKvcTXDnJL3dYxot', access_secret='DbFYyUrJ3gwU8N7aCtzooibhvet7LyO99yXQfte1x4AjZ', tweet_id = 1141470601711955968):
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(access_token, access_secret)
+
+    api = tweepy.API(auth)
+
+    tweet = api.get_status(tweet_id)
+    if tweet: 
+        return tweet.text
+
+    return False
+    
+
+
+
+
+
+##########################################
 
 
 
@@ -1800,6 +1865,9 @@ class CategoryProduct(APIView):
 
 
 
+
+
+
 class NewProductView(APIView):
 
     def get(self,request, account_id):
@@ -1816,19 +1884,13 @@ class NewProductView(APIView):
         starting_price = request.POST.get("starting_price","")
         media = request.FILES.getlist("files","")
 
-        bug_count= 0
-
-        try:
+        if True:
             account = Account.objects.get(id=account_id)
-            bug_count = 'invalid account'
-
             campus_id = account.campus_id
 
             campus = Campus.objects.get(id = campus_id)
-            bug_count = 'invalid campus'
 
             category = Category.objects.get(id = category)
-            bug_count = 'invalid category'
         
 
             newProduct = Product()
@@ -1839,7 +1901,7 @@ class NewProductView(APIView):
             newProduct.product_name = product_name
             #newProduct.product_image = product_image
             newProduct.starting_price = starting_price
-            bug_count = 'assignment bug'
+
            
             i = 0
             for m in media :
@@ -1875,20 +1937,31 @@ class NewProductView(APIView):
 
                         else:
 
-                            bug_count = 'Unsupported file format, file should be valid image, audio or/and video files'
+                            err_msg = 'Unsupported file format, file should be valid image, audio or/and video files'
                     
-
 
                     media_register.product = newProduct
                     media_register.save()
 
                     i = i + 1
-        
+            
 
-            bug_count = 'bug of confusion'
+
+
+            ## upForSell Products, business mode
+            try :
+                topForSell = TopForSell.objects.get(product_name = product_name)
+                topForSell.frequency = topForSell.frequency + 1
+                topForSell.save()
+
+            except:
+                topForSell = TopForSell()
+                topForSell.product_name = product_name
+                topForSell.save()
+
+
             code = newProduct.id
 
-            bug_count = 'invalid product object created'
             success = {
                 'code' : code
                 }
@@ -1897,9 +1970,9 @@ class NewProductView(APIView):
 
             return Response(serializer.data)
 
-        except:
+        else:
 
-            error_message = bug_count
+            error_message = 'yikes! something went wrong'
             err = {
                 'error_message' : error_message
             }
@@ -1924,6 +1997,301 @@ class NewProductView(APIView):
 
 
 
+
+class NewListingView(APIView):
+
+    def get(self,request, account_id):
+        pass
+    
+    def post(self, request, account_id):
+        
+        category = request.POST.get("category","")
+        description = request.POST.get("description","")
+        product_name = request.POST.get("product_name","")
+        #product_image = request.FILES.get("product_image","")
+        budget = request.POST.get("budget","")
+        media = request.FILES.getlist("files","")
+
+        if True:
+            account = Account.objects.get(id=account_id)
+            campus_id = account.campus_id
+
+            campus = Campus.objects.get(id = campus_id)
+
+            category = Category.objects.get(id = category)
+        
+
+            newProduct = Listing()
+            newProduct.account = account
+            newProduct.category = category
+            newProduct.campus = campus
+            newProduct.product_description = description
+            newProduct.product_name = product_name
+            #newProduct.product_image = product_image
+            newProduct.budget = budget
+
+           
+            i = 0
+            for m in media :
+
+                if i == 0:
+                    newProduct.product_image = m
+                    newProduct.save()
+
+                    i = i + 1
+               
+
+                else:
+                    pass
+
+
+            code = account.campus_id
+
+            success = {
+                'code' : code
+                }
+
+            serializer = SuccessCodeSerializer(success, many = False)
+
+            return Response(serializer.data)
+
+        else:
+
+            error_message = 'yikes! something went wrong'
+            err = {
+                'error_message' : error_message
+            }
+            serializer = ErrorCheckSerializer( err, many=False)
+
+            return Response(serializer.data)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class ListingView(APIView):
+
+    def get(self, request, campus_id):
+        
+        buffer = Listing.objects.filter(campus_id = campus_id)
+
+        listings = []
+
+        for item in buffer:
+
+                account_id = item.account_id
+                account = Account.objects.get(id = account_id)
+                phone = account.phone
+
+                product_name = item.product_name
+                product_image = item.product_image
+                product_description = item.product_description
+                budget = item.budget
+
+                context_list = {
+                    'product_name' : product_name,
+                    'product_image' : product_image,
+                    'product_description' : product_description,
+                    'budget' : budget,
+                    'phone' : phone
+                }
+
+                listings.append(context_list)
+
+
+        serializer = ListingSerializer( listings, many=True)
+
+        return Response(serializer.data)
+
+    
+
+    def post(self, request, campus_id):
+        
+        search_phrase = request.POST.get("listing", "")
+        search_bucket = search_phrase.split()
+
+        result_bucket = []
+
+        for word in search_bucket :
+
+            result =  Listing.objects.filter(product_name__icontains = word, campus_id = campus_id, status = False) | Listing.objects.filter(product_description__icontains = word, campus_id = campus_id, status = False) 
+            result_bucket.append(result)
+        
+
+        listings = []
+        for buffer in result_bucket :
+
+            for item in buffer:
+
+                account_id = item.account_id
+                account = Account.objects.get(id = account_id)
+                phone = account.phone
+
+                product_name = item.product_name
+                product_image = item.product_image
+                product_description = item.product_description
+                budget = item.budget
+
+                context_list = {
+                    'product_name' : product_name,
+                    'product_image' : product_image,
+                    'product_description' : product_description,
+                    'budget' : budget,
+                    'phone' : phone
+                }
+
+                listings.append(context_list)
+
+        serializer = ListingSerializer( listings, many=True)
+
+        return Response(serializer.data)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class ListingProduct(APIView):
+
+    def get(self, request):
+        
+        listing = []
+        try:
+            account = get_account(request)
+            listing = Listing.objects.filter(account_id = 3, status=False)
+        except:
+            pass
+
+        
+        serializer = ListingProductSerializer( listing, many=True)
+
+        return Response(serializer.data)
+
+    
+    def post(self, request):
+        pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class RemoveListing(APIView):
+
+    def get(self, request, product_id, status):
+        
+        try:
+            listing = Listing.objects.get(id = product_id)
+            
+            listing.status = True
+
+            if status == '1':
+                listing.success = True
+
+            listing.save()
+
+        except:
+            pass
+
+        return Response(True)
+
+    
+    def post(self, request, product_id, status):
+        pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+class ListingCategory(APIView):
+
+    def get(self, request, campus_id, category_id):
+        
+        if category_id == '99':
+            buffer = Listing.objects.all()
+        else:
+            buffer = Listing.objects.filter(campus_id = campus_id, category_id = category_id)
+        
+        listings = []
+
+        for item in buffer:
+
+                account_id = item.account_id
+                account = Account.objects.get(id = account_id)
+                phone = account.phone
+
+                product_name = item.product_name
+                product_image = item.product_image
+                product_description = item.product_description
+                budget = item.budget
+
+                context_list = {
+                    'product_name' : product_name,
+                    'product_image' : product_image,
+                    'product_description' : product_description,
+                    'budget' : budget,
+                    'phone' : phone
+                }
+
+                listings.append(context_list)
+
+        serializer = ListingSerializer( listings, many=True)
+
+        return Response(serializer.data)
+
+    
+
+    def post(self, request, campus_id, category_id):
+        pass
 
 
 
@@ -3388,7 +3756,7 @@ class NewEShop(APIView):
                 pass
 
 
-            try:
+            if True:
 
                 eshop = EShop()
                 eshop.account = account
@@ -3415,7 +3783,7 @@ class NewEShop(APIView):
 
                 return Response(serializer.data)
 
-            except:
+            else:
                 pass
        
 
@@ -3626,14 +3994,14 @@ class AboutEShop(APIView):
 
             id = account.id
             boss = account.firstname + ' ' + account.lastname
-            phone = account.phone
             dp = account.display_pic
+            phone = account.phone
 
             boss_info = {
                 'id' : id,
                 'boss' : boss,
-                'phone' : phone,
                 'dp' : dp,
+                'phone' : phone
             }   
 
             serializer = AboutEShopSerializer( boss_info, many = False)
@@ -3697,7 +4065,7 @@ class EShopExist(APIView):
             account = get_account(request)
             account_id = account.id
 
-            eshop_exist = EShop.objects.filter(account_id = account_id).exists
+            eshop_exist = EShop.objects.filter(account_id = account_id).exists()
 
             json_object = {
                 'eshop_exist' : eshop_exist
@@ -3711,7 +4079,7 @@ class EShopExist(APIView):
             pass
 
 
-        return Response( False)
+        return Response(False)
 
 
     def post(get, request):
@@ -3719,7 +4087,6 @@ class EShopExist(APIView):
 
 
     
-
 
 
 
@@ -3852,6 +4219,18 @@ class NewEShopProduct(APIView):
                 pass
 
 
+            ## upForSell Products, business mode
+            try :
+                topForSell = TopForSell.objects.get(product_name = product_name)
+                topForSell.frequency = topForSell.frequency + 1
+                topForSell.save()
+
+            except:
+                topForSell = TopForSell()
+                topForSell.product_name = product_name
+                topForSell.save()
+
+
 
 
             code = newProduct.id
@@ -3873,7 +4252,6 @@ class NewEShopProduct(APIView):
             serializer = ErrorCheckSerializer( err, many=False)
 
             return Response(serializer.data)
-
 
 
 
@@ -5344,26 +5722,6 @@ class GetCampus(APIView):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 class CampusCode(APIView):
 
     def get(self,request, campus_id):
@@ -5381,6 +5739,34 @@ class CampusCode(APIView):
     
     def post(self, request):
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6249,7 +6635,7 @@ class AlternatePhoneView(APIView):
 
         try:
             account = get_account(request)
-          
+            account_id = account.id
 
             alternate_phone = AlternatePhone.objects.get(account_id = account.id)
 
@@ -6283,7 +6669,6 @@ class AlternatePhoneView(APIView):
 
                 alternate_phone.save()
 
-
                 code = 11
                 context = {
                     'code' : code
@@ -6293,8 +6678,7 @@ class AlternatePhoneView(APIView):
 
                 return Response(serializer.data)
 
-
-
+                
 
             except:
                 alternate_phone = AlternatePhone()
@@ -6302,8 +6686,7 @@ class AlternatePhoneView(APIView):
                 alternate_phone.phone1 = phone1
                 alternate_phone.phone2 = phone2
                 alternate_phone.save()
-
-
+                
 
                 code = 11
                 context = {
@@ -6314,11 +6697,13 @@ class AlternatePhoneView(APIView):
 
                 return Response(serializer.data)
 
+            
+            
+
 
         except:
             pass 
-
-
+                
         error_message = 'Oops something wrong happened'
 
         context = {             
@@ -6328,9 +6713,6 @@ class AlternatePhoneView(APIView):
         serializer = ErrorCheckSerializer(context, many = False)
 
         return Response(serializer.data)
-
-
-
 
 
 
@@ -6367,6 +6749,18 @@ class AlternatePhoneSellerView(APIView):
     def post(self, request, account_id):
         pass
         
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6446,7 +6840,7 @@ class ForgotPasswordView(APIView):
             new_reset.email = email
             new_reset.save()
 
-            message = 'Hey dear! You are nearly done with your password reset process, Follow this link to reset your password https://iwansell.com/reset_password/' +  str(reset_code) + ' You have done well'
+            message = 'Hey dear! You are nearly done with your password reset process, Follow this link to reset your password http://127.0.0.1:3000/reset_password/' +  str(reset_code) + ' You have done well'
             email = EmailMessage('Your password reset details from Iwansell', message, to=[email])
             email.send()
 
@@ -6531,6 +6925,8 @@ class ResetPassword(APIView):
 
         new_password = request.POST.get("new_password", "")
 
+        bug_net = 1
+
         try :
             forgot_pass = ForgotPassword.objects.get(reset_code = reset_code)
             email = forgot_pass.email
@@ -6538,8 +6934,10 @@ class ResetPassword(APIView):
             account = Account.objects.get(email = email)
             account.password = make_password(new_password)
             account.save()
+            bug_net = 11
 
-            user = User.objects.get(username = email)
+            user = User.objects.get(email = email)
+            bug_net = 911
             user.password = make_password(new_password)
             user.save()
 
@@ -6564,323 +6962,12 @@ class ResetPassword(APIView):
 
             serializer = ErrorCheckSerializer(err, many= False)
 
-            return Response(serializer.data)
+            return Response(bug_net)
 
 
         
 
         
-
-
-
-
-
-
-
-        
-
-
-
-
-
-
-class NewListingView(APIView):
-
-    def get(self,request, account_id):
-        pass
-    
-    def post(self, request, account_id):
-        
-        category = request.POST.get("category","")
-        description = request.POST.get("description","")
-        product_name = request.POST.get("product_name","")
-        #product_image = request.FILES.get("product_image","")
-        budget = request.POST.get("budget","")
-        media = request.FILES.getlist("files","")
-
-        if True:
-            account = Account.objects.get(id=account_id)
-            campus_id = account.campus_id
-
-            campus = Campus.objects.get(id = campus_id)
-
-            category = Category.objects.get(id = category)
-        
-
-            newProduct = Listing()
-            newProduct.account = account
-            newProduct.category = category
-            newProduct.campus = campus
-            newProduct.product_description = description
-            newProduct.product_name = product_name
-            #newProduct.product_image = product_image
-            newProduct.budget = budget
-
-           
-            i = 0
-            for m in media :
-
-                if i == 0:
-                    newProduct.product_image = m
-                    newProduct.save()
-
-                    i = i + 1
-               
-
-                else:
-                    pass
-
-
-            code = account.campus_id
-
-            success = {
-                'code' : code
-                }
-
-            serializer = SuccessCodeSerializer(success, many = False)
-
-            return Response(serializer.data)
-
-        else:
-
-            error_message = 'yikes! something went wrong'
-            err = {
-                'error_message' : error_message
-            }
-            serializer = ErrorCheckSerializer( err, many=False)
-
-            return Response(serializer.data)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-class ListingView(APIView):
-
-    def get(self, request, campus_id):
-        
-        buffer = Listing.objects.filter(campus_id = campus_id)
-
-        listings = []
-
-        for item in buffer:
-
-                account_id = item.account_id
-                account = Account.objects.get(id = account_id)
-                phone = account.phone
-
-                product_name = item.product_name
-                product_image = item.product_image
-                product_description = item.product_description
-                budget = item.budget
-
-                context_list = {
-                    'product_name' : product_name,
-                    'product_image' : product_image,
-                    'product_description' : product_description,
-                    'budget' : budget,
-                    'phone' : phone
-                }
-
-                listings.append(context_list)
-
-
-        serializer = ListingSerializer( listings, many=True)
-
-        return Response(serializer.data)
-
-    
-
-    def post(self, request, campus_id):
-        
-        search_phrase = request.POST.get("listing", "")
-        search_bucket = search_phrase.split()
-
-        result_bucket = []
-
-        for word in search_bucket :
-
-            result =  Listing.objects.filter(product_name__icontains = word, campus_id = campus_id, status = False) | Listing.objects.filter(product_description__icontains = word, campus_id = campus_id, status = False) 
-            result_bucket.append(result)
-        
-
-        listings = []
-        for buffer in result_bucket :
-
-            for item in buffer:
-
-                account_id = item.account_id
-                account = Account.objects.get(id = account_id)
-                phone = account.phone
-
-                product_name = item.product_name
-                product_image = item.product_image
-                product_description = item.product_description
-                budget = item.budget
-
-                context_list = {
-                    'product_name' : product_name,
-                    'product_image' : product_image,
-                    'product_description' : product_description,
-                    'budget' : budget,
-                    'phone' : phone
-                }
-
-                listings.append(context_list)
-
-        serializer = ListingSerializer( listings, many=True)
-
-        return Response(serializer.data)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-class ListingProduct(APIView):
-
-    def get(self, request):
-        
-        try:
-            account = get_account(request)
-            listing = Listing.objects.filter(account_id = 3, status=False)
-        except:
-            pass
-
-        
-        serializer = ListingProductSerializer( listing, many=True)
-
-        return Response(serializer.data)
-
-    
-    def post(self, request):
-        pass
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-class RemoveListing(APIView):
-
-    def get(self, request, product_id, status):
-        
-        try:
-            listing = Listing.objects.get(id = product_id)
-            
-            listing.status = True
-
-            if status == '1':
-                listing.success = True
-
-            listing.save()
-
-        except:
-            pass
-
-        return Response(True)
-
-    
-    def post(self, request, product_id, status):
-        pass
-
-
-
-
-
-
-
-
-
-
-
-
-
-class ListingCategory(APIView):
-
-    def get(self, request, campus_id, category_id):
-        
-        if category_id == '99':
-            buffer = Listing.objects.all()
-        else:
-            buffer = Listing.objects.filter(campus_id = campus_id, category_id = category_id)
-        
-        listings = []
-
-        for item in buffer:
-
-                account_id = item.account_id
-                account = Account.objects.get(id = account_id)
-                phone = account.phone
-
-                product_name = item.product_name
-                product_image = item.product_image
-                product_description = item.product_description
-                budget = item.budget
-
-                context_list = {
-                    'product_name' : product_name,
-                    'product_image' : product_image,
-                    'product_description' : product_description,
-                    'budget' : budget,
-                    'phone' : phone
-                }
-
-                listings.append(context_list)
-
-        serializer = ListingSerializer( listings, many=True)
-
-        return Response(serializer.data)
-
-    
-
-    def post(self, request, campus_id, category_id):
-        pass
-
-
-
-
 
 
 
@@ -6906,7 +6993,7 @@ class ListingCategory(APIView):
 class ChannelView(APIView):
 
     def get(self, request, campus_id):
-
+        
         threadlist = Thread.objects.filter(campus_id = campus_id)
 
         thread_bucket = []
@@ -6937,11 +7024,14 @@ class ChannelView(APIView):
             except:
                 pass
 
+            comment_count = Comment.objects.filter(thread_id = thread_id).count()
+
             upvote = ThreadVote.objects.filter(thread_id = t.id, upvote=True).count()
             downvote = ThreadVote.objects.filter(thread_id = t.id, downvote=True).count()
             votes = upvote - downvote
 
             thread_register = {
+                'comment_count': comment_count,
                 'channel_id': channel_id,
                 'following' : following,
                 'firstname' : firstname,
@@ -6958,12 +7048,12 @@ class ChannelView(APIView):
 
             thread_bucket.append(thread_register)
 
-
+    
         serializer = ThreadSerializer(thread_bucket, many=True)
 
         return Response(serializer.data)
 
-
+    
     def post(self, request, campus_id):
         pass
 
@@ -6987,8 +7077,8 @@ class ChannelView(APIView):
 class ThreadView(APIView):
 
     def get(self, request, thread_id):
-
-        try:
+        
+        try: 
             t = Thread.objects.get(id = thread_id)
 
             title = t.title
@@ -7015,6 +7105,8 @@ class ThreadView(APIView):
             except:
                 pass
 
+            comment_count = Comment.objects.filter(thread_id = thread_id).count()
+
             upvote = ThreadVote.objects.filter(thread_id = t.id, upvote=True).count()
             downvote = ThreadVote.objects.filter(thread_id = t.id, downvote=True).count()
             votes = upvote - downvote
@@ -7030,6 +7122,7 @@ class ThreadView(APIView):
                 'title' : title,
                 'media' : media,
                 'votes' : votes,
+                'comment_count' : comment_count,
                 'date' : date,
                 'logo' : logo,
             }
@@ -7041,18 +7134,18 @@ class ThreadView(APIView):
 
         except:
             pass
-
+        
         return Response(bug_net)
 
 
 
-
+    
     def post(self, request, thread_id):
-
+        
         title = request.POST.get("title","")
         thread = request.POST.get("post","")
         media = request.FILES.getlist("files", "")
-
+      
         if True:
             account = Account.objects.get(id=5)
             channel = Channel.objects.get(account_id = account.id)
@@ -7064,9 +7157,9 @@ class ThreadView(APIView):
             newThread.campus = campus
             newThread.title = title
             newThread.thread = thread
+           
 
-
-
+           
             i = 0
             for m in media :
 
@@ -7131,20 +7224,33 @@ class FollowView(APIView):
             following.save()
 
             status = True
-
-        except:
+        
+        except: 
             pass
 
-
+        
         return Response(status)
+        
+        
+       
+        
 
-
-
-
-
-
+    
     def post(self, request, channel_id):
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -7160,7 +7266,7 @@ class VoteView(APIView):
         try:
             #account = get_account(request)
             account = Account.objects.get(id = 3)
-            try:
+            try: 
                 threadvote = ThreadVote.objects.get(thread_id = thread_id, account_id = account.id)
             except:
                 thread = Thread.objects.get(id = thread_id)
@@ -7172,26 +7278,44 @@ class VoteView(APIView):
                 else:
                     vote.downvote = True
                 vote.save()
-
-
-
+               
+                
+                
             upvote = ThreadVote.objects.filter(thread_id = thread_id, upvote=True).count()
             downvote = ThreadVote.objects.filter(thread_id = thread_id, downvote=True).count()
             votes = upvote - downvote
-
-        except:
+        
+        except: 
             pass
 
-
+        
         return Response(votes)
+        
+        
+       
+        
 
-
-
-
-
-
+    
     def post(self, request, toggle, thread_id):
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -7217,8 +7341,9 @@ class CommentView(APIView):
 
             comment_id = c.id
             comment = c.comment
-            media = c.media
             date = c.date
+
+            comment_count = Reply.objects.filter(comment_id = comment_id).count()
 
             upvote = CommentVote.objects.filter(comment_id = c.id, upvote=True).count()
             downvote = CommentVote.objects.filter(comment_id = c.id, downvote=True).count()
@@ -7227,28 +7352,28 @@ class CommentView(APIView):
             comment_register = {
                 'comment_id' : comment_id,
                 'comment' : comment,
+                'comment_count' : comment_count,
                 'firstname' : firstname,
                 'lastname' : lastname,
                 'votes' : votes,
                 'dp' : dp,
-                'media' : media,
                 'date' : date,
             }
 
             comment_bucket.append(comment_register)
-
+        
         serializer = CommentSerializer(comment_bucket, many=True)
 
         return Response(serializer.data)
-
+        
 
 
 
     def post(self, request, thread_id):
-
+        
         comment = request.POST.get("comment","")
-
-
+       
+      
         if True:
             account = Account.objects.get(id=5)
             thread = Thread.objects.get(id = thread_id)
@@ -7285,7 +7410,21 @@ class CommentView(APIView):
 
 
 
+        
 
+
+
+
+
+
+
+
+
+
+
+
+
+        
 
 
 
@@ -7294,7 +7433,7 @@ class ReplyView(APIView):
 
     def get(self, request, comment_id):
 
-        reply = Reply.objects.filter( comment_id = comment_id, depth=1)
+        reply = Reply.objects.filter( comment_id = comment_id)
 
         reply_bucket = []
 
@@ -7307,8 +7446,9 @@ class ReplyView(APIView):
 
             reply_id = r.id
             reply = r.reply
-            media = r.media
             date = r.date
+
+            reply_count = Reply1.objects.filter(reply_id = reply_id).count()
 
             upvote = ReplyVote.objects.filter(reply_id = r.id, upvote=True).count()
             downvote = ReplyVote.objects.filter(reply_id = r.id, downvote=True).count()
@@ -7317,29 +7457,29 @@ class ReplyView(APIView):
             reply_register = {
                 'reply_id' : reply_id,
                 'reply' : reply,
+                'reply_count' : reply_count,
                 'firstname' : firstname,
                 'lastname' : lastname,
                 'votes' : votes,
                 'dp' : dp,
-                'media' : media,
                 'date' : date,
             }
 
             reply_bucket.append(reply_register)
 
         serializer = ReplySerializer(reply_bucket, many=True)
-
+        
         return Response(serializer.data)
 
 
 
-
+    
     def post(self, request, comment_id):
-
-
+        
+        
         reply = request.POST.get("reply","")
-
-
+       
+      
         if True:
             account = Account.objects.get(id=5)
             comment = Comment.objects.get(id = comment_id)
@@ -7348,12 +7488,195 @@ class ReplyView(APIView):
             newReply.account = account
             newReply.comment = comment
             newReply.reply = reply
-            newReply.depth = 1
             newReply.save()
 
-            parentreplymap = ParentReplyMap()
-            parentreplymap.reply = newReply
-            parentreplymap.save()
+            code = newReply.id
+
+            success = {
+                'code' : code
+                }
+
+            serializer = SuccessCodeSerializer(success, many = False)
+
+            return Response(serializer.data)
+
+        else:
+
+            error_message = 'yikes! something went wrong'
+            err = {
+                'error_message' : error_message
+            }
+            serializer = ErrorCheckSerializer( err, many=False)
+
+            return Response(serializer.data)
+
+
+
+
+
+
+
+
+################################ Reply Tree Redesign
+class Reply1View(APIView):
+
+    def get(self, request, reply_id):
+
+        reply = Reply1.objects.filter( reply_id = reply_id)
+
+        reply_bucket = []
+
+        for r in reply:
+
+            account = Account.objects.get(id = r.account_id)
+            firstname = account.firstname
+            lastname = account.lastname
+            dp = account.display_pic
+
+            reply_id = r.id
+            reply = r.reply_t
+            date = r.date
+
+            reply_count = Reply2.objects.filter(reply1_id = reply_id).count()
+
+            upvote = Reply1Vote.objects.filter(reply1_id = r.id, upvote=True).count()
+            downvote = Reply1Vote.objects.filter(reply1_id = r.id, downvote=True).count()
+            votes = upvote - downvote
+
+            reply_register = {
+                'reply_id' : reply_id,
+                'reply' : reply,
+                'reply_count' : reply_count,
+                'firstname' : firstname,
+                'lastname' : lastname,
+                'votes' : votes,
+                'dp' : dp,
+                'date' : date,
+            }
+
+            reply_bucket.append(reply_register)
+
+        serializer = ReplySerializer(reply_bucket, many=True)
+        
+        return Response(serializer.data)
+
+
+
+    
+    def post(self, request, reply_id):
+        
+        
+        reply_t = request.POST.get("reply","")
+       
+      
+        if True:
+            account = Account.objects.get(id=5)
+            reply = Reply.objects.get(id = reply_id)
+
+            newReply = Reply1()
+            newReply.account = account
+            newReply.reply = reply
+            newReply.reply_t = reply_t
+            newReply.save()
+
+            code = newReply.id
+
+            success = {
+                'code' : code
+                }
+
+            serializer = SuccessCodeSerializer(success, many = False)
+
+            return Response(serializer.data)
+
+        else:
+
+            error_message = 'yikes! something went wrong'
+            err = {
+                'error_message' : error_message
+            }
+            serializer = ErrorCheckSerializer( err, many=False)
+
+            return Response(serializer.data)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class Reply2View(APIView):
+
+    def get(self, request, reply_id):
+
+        reply = Reply2.objects.filter( reply1_id = reply_id)
+
+        reply_bucket = []
+
+        for r in reply:
+
+            account = Account.objects.get(id = r.account_id)
+            firstname = account.firstname
+            lastname = account.lastname
+            dp = account.display_pic
+
+            reply_id = r.id
+            reply = r.reply
+            date = r.date
+
+            reply_count = Reply3.objects.filter(reply2_id = reply_id).count()
+
+            upvote = Reply2Vote.objects.filter(reply2_id = r.id, upvote=True).count()
+            
+
+            downvote = Reply2Vote.objects.filter(reply2_id = r.id, downvote=True).count()
+            votes = upvote - downvote
+
+            reply_register = {
+                'reply_id' : reply_id,
+                'reply' : reply,
+                'reply_count' : reply_count,
+                'firstname' : firstname,
+                'lastname' : lastname,
+                'votes' : votes,
+                'dp' : dp,
+                'date' : date,
+            }
+
+            reply_bucket.append(reply_register)
+
+        serializer = ReplySerializer(reply_bucket, many=True)
+        
+        return Response(serializer.data)
+
+
+
+    
+    def post(self, request, reply_id):
+        
+        
+        reply = request.POST.get("reply","")
+       
+      
+        if True:
+            account = Account.objects.get(id=5)
+            reply1 = Reply1.objects.get(id = reply_id)
+
+            newReply = Reply2()
+            newReply.account = account
+            newReply.reply1 = reply1
+            newReply.reply = reply
+            newReply.save()
 
             code = newReply.id
 
@@ -7396,25 +7719,15 @@ class ReplyView(APIView):
 
 
 
-class ReplyTreeView(APIView):
+class Reply3View(APIView):
 
     def get(self, request, reply_id):
 
-        try:
-            p_reply_ = ParentReplyMap.objects.get(reply_id = reply_id)
-            parent_map = Map.objects.filter(parentreplymap_id = p_reply_.id)
-
-        except:
-            null = []
-            return Response(null)
+        reply_ = Reply3.objects.filter( reply2_id = reply_id)
 
         reply_bucket = []
 
-        for p in parent_map:
-
-            reply = Reply.objects.get(id = p.reply_id)
-
-            r = Reply.objects.get(id = reply.id)
+        for r in reply_:
 
             account = Account.objects.get(id = r.account_id)
             firstname = account.firstname
@@ -7423,70 +7736,155 @@ class ReplyTreeView(APIView):
 
             reply_id = r.id
             reply = r.reply
-            media = r.media
             date = r.date
 
-            upvote = ReplyVote.objects.filter(reply_id = r.id, upvote=True).count()
-            downvote = ReplyVote.objects.filter(reply_id = r.id, downvote=True).count()
+            reply_count = Reply4.objects.filter(reply3_id = reply_id).count()
+           
+            upvote = Reply3Vote.objects.filter(reply3_id = r.id, upvote=True).count()
+            downvote = Reply3Vote.objects.filter(reply3_id = r.id, downvote=True).count()
             votes = upvote - downvote
 
             reply_register = {
                 'reply_id' : reply_id,
                 'reply' : reply,
+                'reply_count' : reply_count,
                 'firstname' : firstname,
                 'lastname' : lastname,
                 'votes' : votes,
                 'dp' : dp,
-                'media' : media,
                 'date' : date,
             }
 
             reply_bucket.append(reply_register)
 
         serializer = ReplySerializer(reply_bucket, many=True)
-
+        
         return Response(serializer.data)
 
 
 
+    
     def post(self, request, reply_id):
-
-        try:
-
-            r_comment = Reply.objects.get(id = reply_id)
-            comment_id = r_comment.comment_id
-            comment = Comment.objects.get(id = comment_id)
-
-        except:
-
-            return Response('control broke')
-
+        
+        
         reply = request.POST.get("reply","")
-
+       
+      
         if True:
             account = Account.objects.get(id=5)
-            reply_ = Reply.objects.get(id = reply_id)
-            parent = ParentReplyMap.objects.get(reply_id = reply_id)
+            reply2 = Reply2.objects.get(id = reply_id)
 
-            newReply = Reply()
+            newReply = Reply3()
             newReply.account = account
-            newReply.comment = comment
+            newReply.reply2 = reply2
             newReply.reply = reply
-            newReply.depth = 11
             newReply.save()
 
-            map_ = Map()
-            map_.parentreplymap = parent
-            map_.replymap = newReply
-            map_.save()
-
-            parentreplymap = ParentReplyMap()
-            parentreplymap.reply = newReply
-            parentreplymap.save()
-
-            code = map_.id
+            code = newReply.id
 
             success = {
+                'code' : code
+                }
+
+            serializer = SuccessCodeSerializer(success, many = False)
+
+            return Response(serializer.data)
+
+        else:
+
+            error_message = 'yikes! something went wrong'
+            err = {
+                'error_message' : error_message
+            }
+            serializer = ErrorCheckSerializer( err, many=False)
+            return Response(serializer.data)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class Reply4View(APIView):
+
+    def get(self, request, reply_id):
+
+        reply = Reply4.objects.filter( reply3_id = reply_id)
+
+        reply_bucket = []
+
+        for r in reply:
+
+            account = Account.objects.get(id = r.account_id)
+            firstname = account.firstname
+            lastname = account.lastname
+            dp = account.display_pic
+
+            reply_id = r.id
+            reply = r.reply
+            date = r.date
+
+            reply_count = 11
+
+            upvote = Reply4Vote.objects.filter(reply4_id = r.id, upvote=True).count()
+            downvote = Reply4Vote.objects.filter(reply4_id = r.id, downvote=True).count()
+            votes = upvote - downvote
+
+            reply_register = {
+                'reply_id' : reply_id,
+                'reply' : reply,
+                'reply_count' : reply_count,
+                'firstname' : firstname,
+                'lastname' : lastname,
+                'votes' : votes,
+                'dp' : dp,
+                'date' : date,
+            }
+
+            reply_bucket.append(reply_register)
+
+        serializer = ReplySerializer(reply_bucket, many=True)
+        
+        return Response(serializer.data)
+
+
+
+    
+    def post(self, request, reply_id):
+        
+        
+        reply = request.POST.get("reply","")
+       
+      
+        if True:
+            account = Account.objects.get(id=5)
+            reply3 = Reply3.objects.get(id = reply_id)
+
+            newReply = Reply4()
+            newReply.account = account
+            newReply.reply3 = reply3
+            newReply.reply = reply
+            newReply.save()
+
+            code = newReply.id
+
+            success = {
+
                 'code' : code
                 }
 
@@ -7516,28 +7914,53 @@ class ReplyTreeView(APIView):
 
 
 
-class GetChannel(APIView):
 
-    def get(self,request):
 
+
+
+
+class VoteComment(APIView):
+
+    def get(self, request, toggle, comment_id):
+
+        upvote = CommentVote.objects.filter(comment_id = comment_id, upvote=True).count()
+        downvote = CommentVote.objects.filter(comment_id = comment_id, downvote=True).count()
+        votes = upvote - downvote
 
         try:
-            account = Account.objects.get(id = 5)
-            account_id = account.id
+            #account = get_account(request)
+            account = Account.objects.get(id = 3)
+            try: 
+                commentvote = CommentVote.objects.get(comment_id = comment_id, account_id = account.id)
+            except:
+                comment = Comment.objects.get(id = comment_id)
+                vote = CommentVote()
+                vote.comment = comment
+                vote.account = account
+                if toggle == '1':
+                    vote.upvote = True
+                else:
+                    vote.downvote = True
+                vote.save()
+               
+                
+                
+            upvote = CommentVote.objects.filter(comment_id = comment_id, upvote=True).count()
+            downvote = CommentVote.objects.filter(comment_id = comment_id, downvote=True).count()
+            votes = upvote - downvote
+        
+        except: 
+            pass
 
-            channel = Channel.objects.get(account_id = account_id)
-            channel_name = "Add new post[" + channel.channel + "]"
+        
+        return Response(votes)
+        
+        
+       
+        
 
-        except:
-
-            channel_name = "Wrong turn, try again"
-
-
-        return Response(str(channel_name))
-
-
-
-    def post(self, request):
+    
+    def post(self, request, toggle, comment_id):
         pass
 
 
@@ -7552,7 +7975,392 @@ class GetChannel(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+class VoteReply(APIView):
+
+    def get(self, request, toggle, reply_id):
+
+        upvote = ReplyVote.objects.filter(reply_id = reply_id, upvote=True).count()
+        downvote = ReplyVote.objects.filter(reply_id = reply_id, downvote=True).count()
+        votes = upvote - downvote
+
+        try:
+            #account = get_account(request)
+            account = Account.objects.get(id = 3)
+            try: 
+                replyvote = ReplyVote.objects.get(reply_id = reply_id, account_id = account.id)
+            except:
+                reply = Reply.objects.get(id = reply_id)
+                vote = ReplyVote()
+                vote.reply = reply
+                vote.account = account
+                if toggle == '1':
+                    vote.upvote = True
+                else:
+                    vote.downvote = True
+                vote.save()
+               
+                
+                
+            upvote = ReplyVote.objects.filter(reply_id = reply_id, upvote=True).count()
+            downvote = ReplyVote.objects.filter(reply_id = reply_id, downvote=True).count()
+            votes = upvote - downvote
         
+        except: 
+            pass
+
+        
+        return Response(votes)
+        
+        
+       
+        
+
+    
+    def post(self, request, toggle, reply_id):
+        pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class VoteReply1(APIView):
+
+    def get(self, request, toggle, reply_id):
+
+        upvote = Reply1Vote.objects.filter(reply1_id = reply_id, upvote=True).count()
+        downvote = Reply1Vote.objects.filter(reply1_id = reply_id, downvote=True).count()
+        votes = upvote - downvote
+
+        try:
+            #account = get_account(request)
+            account = Account.objects.get(id = 3)
+            try: 
+                replyvote = Reply1Vote.objects.get(reply1_id = reply_id, account_id = account.id)
+            except:
+                reply = Reply1.objects.get(id = reply_id)
+                vote = Reply1Vote()
+                vote.reply1 = reply
+                vote.account = account
+                if toggle == '1':
+                    vote.upvote = True
+                else:
+                    vote.downvote = True
+                vote.save()
+               
+                
+                
+            upvote = Reply1Vote.objects.filter(reply1_id = reply_id, upvote=True).count()
+            downvote = Reply1Vote.objects.filter(reply1_id = reply_id, downvote=True).count()
+            votes = upvote - downvote
+        
+        except: 
+            pass
+
+        
+        return Response(votes)
+        
+        
+       
+        
+
+    
+    def post(self, request, toggle, reply_id):
+        pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class VoteReply2(APIView):
+
+    def get(self, request, toggle, reply_id):
+
+        upvote = Reply2Vote.objects.filter(reply2_id = reply_id, upvote=True).count()
+        downvote = Reply2Vote.objects.filter(reply2_id = reply_id, downvote=True).count()
+        votes = upvote - downvote
+
+        try:
+            #account = get_account(request)
+            account = Account.objects.get(id = 3)
+            try: 
+                replyvote = Reply2Vote.objects.get(reply2_id = reply_id, account_id = account.id)
+            except:
+                reply = Reply2.objects.get(id = reply_id)
+                vote = Reply2Vote()
+                vote.reply2 = reply
+                vote.account = account
+                if toggle == '1':
+                    vote.upvote = True
+                else:
+                    vote.downvote = True
+                vote.save()
+               
+                
+                
+            upvote = Reply2Vote.objects.filter(reply2_id = reply_id, upvote=True).count()
+            downvote = Reply2Vote.objects.filter(reply2_id = reply_id, downvote=True).count()
+            votes = upvote - downvote
+        
+        except: 
+            pass
+
+        
+        return Response(votes)
+        
+        
+       
+        
+
+    
+    def post(self, request, toggle, reply_id):
+        pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class VoteReply3(APIView):
+
+    def get(self, request, toggle, reply_id):
+
+        upvote = Reply3Vote.objects.filter(reply3_id = reply_id, upvote=True).count()
+        downvote = Reply3Vote.objects.filter(reply3_id = reply_id, downvote=True).count()
+        votes = upvote - downvote
+
+        try:
+            #account = get_account(request)
+            account = Account.objects.get(id = 3)
+            try: 
+                replyvote = Reply3Vote.objects.get(reply3_id = reply_id, account_id = account.id)
+            except:
+                reply = Reply3.objects.get(id = reply_id)
+                vote = Reply3Vote()
+                vote.reply3 = reply
+                vote.account = account
+                if toggle == '1':
+                    vote.upvote = True
+                else:
+                    vote.downvote = True
+                vote.save()
+               
+                
+                
+            upvote = Reply3Vote.objects.filter(reply3_id = reply_id, upvote=True).count()
+            downvote = Reply3Vote.objects.filter(reply3_id = reply_id, downvote=True).count()
+            votes = upvote - downvote
+        
+        except: 
+            pass
+
+        
+        return Response(votes)
+        
+        
+       
+        
+
+    
+    def post(self, request, toggle, reply_id):
+        pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class VoteReply4(APIView):
+
+    def get(self, request, toggle, reply_id):
+
+        upvote = Reply4Vote.objects.filter(reply4_id = reply_id, upvote=True).count()
+        downvote = Reply4Vote.objects.filter(reply4_id = reply_id, downvote=True).count()
+        votes = upvote - downvote
+
+        try:
+            #account = get_account(request)
+            account = Account.objects.get(id = 3)
+            try: 
+                replyvote = Reply4Vote.objects.get(reply4_id = reply_id, account_id = account.id)
+            except:
+                reply = Reply4.objects.get(id = reply_id)
+                vote = Reply4Vote()
+                vote.reply4 = reply
+                vote.account = account
+                if toggle == '1':
+                    vote.upvote = True
+                else:
+                    vote.downvote = True
+                vote.save()
+               
+                
+                
+            upvote = Reply4Vote.objects.filter(reply4_id = reply_id, upvote=True).count()
+            downvote = Reply4Vote.objects.filter(reply4_id = reply_id, downvote=True).count()
+            votes = upvote - downvote
+        
+        except: 
+            pass
+
+        
+        return Response(votes)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class GetChannel(APIView):
+
+    def get(self,request):
+        
+        
+        try:
+            account = Account.objects.get(id = 5)
+            account_id = account.id
+
+            channel = Channel.objects.get(account_id = account_id)
+            channel_name = "Add new post[" + channel.channel + "]"
+
+        except:
+            
+            channel_name = "Wrong turn, try again"
+
+
+        return Response(str(channel_name))
+    
+
+    
+    def post(self, request):
+        pass
+
+        
+
+
+
+
+
+
+
 
 
 
@@ -7583,34 +8391,6 @@ def logout(request):
                 
 
 
-       
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-
-        

@@ -3,7 +3,12 @@ from __future__ import unicode_literals
 from django.db import models
 from datetime import datetime
 from django.utils import timezone
+from django_random_queryset import RandomManager
 import pytz
+
+
+
+
 
 class Campus(models.Model):
     campus = models.CharField(max_length=100, default="Federal University of Technology Minna")
@@ -11,6 +16,14 @@ class Campus(models.Model):
 
     def __str__(self):
         return self.campus_code
+
+
+
+
+
+
+
+
 
 class Account(models.Model):
     email = models.EmailField(default="iwansell@gmail.com")
@@ -27,6 +40,14 @@ class Account(models.Model):
 
 
 
+
+
+
+
+
+
+
+
 class AlternatePhone(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     phone1 = models.CharField(max_length=14)
@@ -34,6 +55,13 @@ class AlternatePhone(models.Model):
 
     def __str__(self):
         return self.phone1 + ' ' + self.phone2
+
+
+
+
+
+
+
 
 
 class Category(models.Model):
@@ -52,6 +80,15 @@ class Category(models.Model):
 
 
 
+
+
+
+
+
+
+
+
+
 class SubCategory(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     name = models.CharField(max_length = 100)
@@ -63,6 +100,16 @@ class SubCategory(models.Model):
 
     class Meta:
         ordering = ['name']
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -88,10 +135,33 @@ class Product(models.Model):
          return self.product_name
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 class Media(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     image = models.FileField()
     video = models.FileField()
+
+
+
+
+
+
+
+
+
+
+
 
 
 class Sponsored(models.Model):
@@ -101,6 +171,15 @@ class Sponsored(models.Model):
 
     def __str__(self):
          return 'succesful'
+
+
+
+
+
+
+
+
+
 
 
 class Trending(models.Model):
@@ -115,12 +194,31 @@ class Trending(models.Model):
 
 
 
+
+
+
+
+
+
+
+
 class ProductView(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     views = models.IntegerField()
 
     def __str__(self):
          return self.views
+
+
+
+
+
+
+
+
+
+
+
 
 
 class RecentView(models.Model):
@@ -132,6 +230,16 @@ class RecentView(models.Model):
          return self.product
 
 
+
+
+
+
+
+
+
+
+
+
 class Feedback(models.Model):
     firstname = models.CharField(max_length=30)
     lastname = models.CharField(max_length=30)
@@ -140,10 +248,30 @@ class Feedback(models.Model):
     def __str__(self):
          return self.feed
 
+
+
+
+
+
+
+
+
+
 class ForgotPassword(models.Model):
     email = models.EmailField()
     reset_code = models.CharField(default = '123579', max_length = 30)
     date = models.DateTimeField(default = timezone.now)
+
+
+
+
+
+
+
+
+
+
+
 
 
 class EHaggler(models.Model):
@@ -152,6 +280,22 @@ class EHaggler(models.Model):
     delete_for_1 = models.BooleanField(default=False)
     delete_for_2 = models.BooleanField(default=False)
     date = models.DateTimeField(default = timezone.now)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 class Messenger(models.Model):
@@ -171,6 +315,16 @@ class Messenger(models.Model):
     
 
 
+
+
+
+
+
+
+
+
+
+
 class EShop(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     campus = models.ForeignKey(Campus, default=1, on_delete=models.CASCADE)
@@ -181,6 +335,13 @@ class EShop(models.Model):
 
     def __str__(self):
         return self.name
+
+
+
+
+
+
+
 
 
 
@@ -197,6 +358,16 @@ class EShopCategory(models.Model):
 
 
 
+
+
+
+
+
+
+
+
+
+
 class EShopProduct(models.Model):
     eshop = models.ForeignKey(EShop, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -208,11 +379,27 @@ class EShopProduct(models.Model):
         ordering = ['subcategory']
 
 
+
+
+
+
+
+
+
+
 class FavoriteProduct(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     date = models.DateTimeField(default = timezone.now)
     
+
+
+
+
+
+
+
+
 
 
 class FavoriteClient(models.Model):
@@ -221,10 +408,32 @@ class FavoriteClient(models.Model):
     date = models.DateTimeField(default = timezone.now)
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 class FavoriteEShop(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     eshop = models.ForeignKey(EShop, on_delete=models.CASCADE)
     date = models.DateTimeField(default = timezone.now)
+
+
+
+
+
+
+
+
+
+
 
 class RateReview(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
@@ -235,26 +444,47 @@ class RateReview(models.Model):
     def __str__(self):
         return self.review
 
+    
+    class Meta:
+        ordering = ['-date']
+
+
+
+
+
+
+
+
+
 
 
 class ClientRateReview(models.Model):
     ratereview = models.ForeignKey(RateReview, on_delete=models.CASCADE)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
-    date = models.DateTimeField(default = timezone.now)
 
 
-    class Meta:
-        ordering = ['-date']
+
+
+
+
+
+
+
+
 
 
 class EShopRateReview(models.Model):
     ratereview = models.ForeignKey(RateReview, on_delete=models.CASCADE)
     eshop = models.ForeignKey(EShop, on_delete=models.CASCADE)
-    date = models.DateTimeField(default = timezone.now)
 
 
-    class Meta:
-        ordering = ['-date']
+
+
+
+
+
+
+
 
 
 class Blog(models.Model):
@@ -274,8 +504,21 @@ class Blog(models.Model):
 
 
 
+
+
+
+
+
+
+
+
 class PaymentMethod(models.Model):
     payment_method = models.CharField(max_length = 30)
+
+
+
+
+
 
 
 class Transaction(models.Model):
@@ -301,6 +544,13 @@ class Transaction(models.Model):
 
 
 
+
+
+
+
+
+
+
 class Sold(models.Model):
     product_name = models.CharField(max_length= 150)
     frequency = models.IntegerField(default = 1)
@@ -311,6 +561,15 @@ class Sold(models.Model):
 
     class Meta:
         ordering = ['-frequency']
+
+
+
+
+
+
+
+
+
 
 
 
@@ -330,6 +589,14 @@ class NotFound(models.Model):
 
 
 
+
+
+
+
+
+
+
+
 class TopSearched(models.Model):
     product_name = models.CharField(max_length= 150)
     frequency = models.IntegerField(default = 1)
@@ -340,6 +607,19 @@ class TopSearched(models.Model):
 
     class Meta:
         ordering = ['-frequency']
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -356,10 +636,6 @@ class TopForSell(models.Model):
 
 
 
-
-
-
-    
 
 
 ###### New ##########
@@ -384,6 +660,16 @@ class Listing(models.Model):
 
 
 
+
+
+
+
+
+
+
+
+
+
 class Channel(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     campus = models.ForeignKey(Campus, on_delete=models.CASCADE)
@@ -398,6 +684,14 @@ class Channel(models.Model):
 
 
 
+
+
+
+
+
+
+
+
 class Following(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
@@ -405,6 +699,15 @@ class Following(models.Model):
 
     class Meta:
         ordering = ['-date']
+
+
+
+
+
+
+
+
+
 
 
 
@@ -419,9 +722,19 @@ class Thread(models.Model):
 
     class Meta:
         ordering = ['-date']
-
+    
     def __str__(self):
         return self.thread
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -434,6 +747,13 @@ class ThreadVote(models.Model):
 
     def __str__(self):
          return self.upvote + ' ' + self.downvote
+    
+
+
+
+
+
+
 
 
 
@@ -449,9 +769,18 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.comment
-
+    
     class Meta:
         ordering = ['-date']
+        
+
+
+
+
+
+
+
+
 
 
 
@@ -461,9 +790,19 @@ class CommentVote(models.Model):
     upvote = models.BooleanField(default=False)
     downvote = models.BooleanField(default=False)
     date = models.DateTimeField(default = timezone.now)
-
+    
     def __str__(self):
         return self.vote
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -472,13 +811,20 @@ class Reply(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     reply = models.TextField()
     date = models.DateTimeField(default = timezone.now)
-
+    
     def __str__(self):
         return self.reply
 
-
+    
     class Meta:
         ordering = ['-date']
+        
+
+
+
+
+
+
 
 
 class ReplyVote(models.Model):
@@ -490,19 +836,35 @@ class ReplyVote(models.Model):
 
 
 
+
+
+
+
+
+
+
+
 ###### Reply1
 class Reply1(models.Model):
     reply = models.ForeignKey(Reply, on_delete=models.CASCADE)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     reply_t = models.TextField()
     date = models.DateTimeField(default = timezone.now)
-
+    
     def __str__(self):
         return self.reply
 
-
+    
     class Meta:
         ordering = ['-date']
+        
+
+
+
+
+
+
+
 
 
 class Reply1Vote(models.Model):
@@ -513,19 +875,40 @@ class Reply1Vote(models.Model):
     date = models.DateTimeField(default = timezone.now)
 
 
+
+
+
+
+
+
+
+
+
+
 ######## Reply2 #######
 class Reply2(models.Model):
     reply1 = models.ForeignKey(Reply1, on_delete=models.CASCADE)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     reply = models.TextField()
     date = models.DateTimeField(default = timezone.now)
-
+    
     def __str__(self):
         return self.reply
 
-
+    
     class Meta:
         ordering = ['-date']
+        
+
+
+
+
+
+
+
+
+
+
 
 
 class Reply2Vote(models.Model):
@@ -538,20 +921,34 @@ class Reply2Vote(models.Model):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ####### Reply3
 class Reply3(models.Model):
     reply2 = models.ForeignKey(Reply2, on_delete=models.CASCADE)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     reply = models.TextField()
     date = models.DateTimeField(default = timezone.now)
-
+    
     def __str__(self):
         return self.reply
 
-
+    
     class Meta:
         ordering = ['-date']
-
+        
 
 class Reply3Vote(models.Model):
     reply3 = models.ForeignKey(Reply3, on_delete=models.CASCADE)
@@ -563,19 +960,42 @@ class Reply3Vote(models.Model):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ######Reply4
 class Reply4(models.Model):
     reply3 = models.ForeignKey(Reply3, on_delete=models.CASCADE)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     reply = models.TextField()
     date = models.DateTimeField(default = timezone.now)
-
+    
     def __str__(self):
         return self.reply
 
-
+    
     class Meta:
         ordering = ['-date']
+        
+
+
+
+
+
+
+
+
 
 
 class Reply4Vote(models.Model):
@@ -584,5 +1004,46 @@ class Reply4Vote(models.Model):
     upvote = models.BooleanField(default=False)
     downvote = models.BooleanField(default=False)
     date = models.DateTimeField(default = timezone.now)
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+    
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
 
 
